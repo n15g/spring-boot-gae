@@ -1,0 +1,27 @@
+group 'gae.spring'
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'wrapper'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.google.code.findbugs:jsr305:3.0.2'
+    compile "com.google.appengine:appengine-api-1.0-sdk:${appengineVersion}"
+    compile "com.googlecode.objectify:objectify:${objectifyVersion}"
+    compile 'org.apache.commons:commons-lang3:3.6'
+
+    compile 'javax.servlet:javax.servlet-api:3.1.0'
+    compile "org.springframework.boot:spring-boot-starter:${springBootVersion}"
+    compile 'org.springframework.data:spring-data-commons:1.13.6.RELEASE'
+
+    testCompile 'com.openpojo:openpojo:0.8.6'
+    testCompile "com.google.appengine:appengine-testing:${appengineVersion}"
+    testCompile "com.google.appengine:appengine-api-stubs:${appengineVersion}"
+    testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+}
