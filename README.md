@@ -23,3 +23,9 @@ To install the library to your local maven repository (to use it in other projec
 ### Updating the Library Version
 
 Update the `version` property in `gradle.properties`.
+
+### TODO
+* SearchService.
+* `ExceptionTranslationPostProcessor`.
+* `@Transactional` support.
+* `QueryLookupStrategy`.

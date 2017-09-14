@@ -9,6 +9,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -55,10 +56,10 @@ public class AbstractAsyncRepositoryTest extends ObjectifyTest {
     private class SomeEntityManager extends AbstractAsyncRepository<TestStringEntity, Long> {
     }
 
-    private class RepositoryA<E, I> extends AbstractAsyncRepository<E, I> {
+    private class RepositoryA<E, I extends Serializable> extends AbstractAsyncRepository<E, I> {
     }
 
-    private class RepositoryB<E, I> extends RepositoryA<E, I> {
+    private class RepositoryB<E, I extends Serializable> extends RepositoryA<E, I> {
     }
 
     private class RepositoryC extends RepositoryB<TestStringEntity, String> {

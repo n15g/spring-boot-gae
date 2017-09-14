@@ -2,9 +2,11 @@ package gae.spring.data.objectify.repository;
 
 import com.google.appengine.api.datastore.Query;
 import com.googlecode.objectify.Key;
+import org.springframework.data.repository.NoRepositoryBean;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -20,7 +22,8 @@ import java.util.stream.Collectors;
  * @param <E> The entity type.
  * @param <I> The id type of the entity.
  */
-public interface Repository<E, I> extends AsyncRepository<E, I> {
+@NoRepositoryBean
+public interface Repository<E, I extends Serializable> extends AsyncRepository<E, I> {
     /**
      * Save the given entity.
      *

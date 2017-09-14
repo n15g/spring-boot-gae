@@ -7,6 +7,7 @@ import org.springframework.data.util.Pair;
 import gae.spring.data.objectify.ObjectifyProxy;
 
 import javax.annotation.Nonnull;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 
 /**
@@ -17,7 +18,7 @@ import java.lang.reflect.Field;
  * @param <I> Entity id type.
  */
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
-public abstract class AbstractAsyncRepository<E, I> implements AsyncRepository<E, I> {
+public abstract class AbstractAsyncRepository<E, I extends Serializable> implements AsyncRepository<E, I> {
 
     protected final Class<E> entityType;
     protected final Class<I> idType;

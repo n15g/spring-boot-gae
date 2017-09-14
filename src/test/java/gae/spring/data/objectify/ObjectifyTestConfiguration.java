@@ -1,13 +1,14 @@
 package gae.spring.data.objectify;
 
+import gae.spring.data.objectify.config.ObjectifyConfigurer;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Configuration
-@Import(ObjectifyAutoConfiguration.class)
+@EnableAutoConfiguration
 public class ObjectifyTestConfiguration implements ObjectifyConfigurer {
     @Override
     public List<Class<?>> registerObjectifyEntities() {

@@ -1,5 +1,7 @@
 package gae.spring.data.objectify.repository;
 
+import java.io.Serializable;
+
 /**
  * Basic repository.
  * <p>
@@ -8,5 +10,5 @@ package gae.spring.data.objectify.repository;
  * @param <E> Entity type.
  * @param <I> Entity id type.
  */
-public abstract class AbstractRepository<E, I> extends AbstractAsyncRepository<E, I> implements Repository<E, I> {
+public abstract class AbstractRepository<E, I extends Serializable> extends AbstractAsyncRepository<E, I> implements Repository<E, I> {
 }
