@@ -118,26 +118,26 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
     }
 
     @Test
-    public void list() throws Exception {
+    public void findAll() throws Exception {
         TestStringEntity[] entities = fixture.get(3);
         ofy().save().entities(entities).now();
 
-        assertThat(getRepository().list())
+        assertThat(getRepository().findAll())
                 .containsExactlyInAnyOrder(entities);
     }
 
     @Test
-    public void list_willReturnEmptyList_whenThereAreNoEntities() throws Exception {
-        assertThat(getRepository().list())
+    public void findAll_willReturnEmptyList_whenThereAreNoEntities() throws Exception {
+        assertThat(getRepository().findAll())
                 .isEmpty();
     }
 
     @Test
-    public void listWithCount() throws Exception {
+    public void findAllWithCount() throws Exception {
         TestStringEntity[] entities = fixture.get(3);
         ofy().save().entities(entities).now();
 
-        List<TestStringEntity> result = getRepository().list(2);
+        List<TestStringEntity> result = getRepository().findAll(2);
         assertThat(result)
                 .hasSize(2)
                 .containsExactlyInAnyOrder(entities[0], entities[1]);
@@ -145,13 +145,13 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
     }
 
     @Test
-    public void listWithCount_willReturnEmptyList_whenThereAreNoEntities() throws Exception {
-        assertThat(getRepository().list(69))
+    public void findAllWithCount_willReturnEmptyList_whenThereAreNoEntities() throws Exception {
+        assertThat(getRepository().findAll(69))
                 .isEmpty();
     }
 
     @Test
-    public void listByField() throws Exception {
+    public void findAllByField() throws Exception {
         TestStringEntity[] entities = fixture.get(3);
         entities[0].setName("Bob");
         entities[1].setName("Bob");
@@ -159,13 +159,13 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
 
         ofy().save().entities(entities).now();
 
-        assertThat(getRepository().listByField("name", "Bob"))
+        assertThat(getRepository().findAllByField("name", "Bob"))
                 .containsExactlyInAnyOrder(entities[0], entities[1])
                 .doesNotContain(entities[2]);
     }
 
     @Test
-    public void listByField_willNotReturnMatches_whenCaseIsMismatched() throws Exception {
+    public void findAllByField_willNotReturnMatches_whenCaseIsMismatched() throws Exception {
         TestStringEntity[] entities = fixture.get(3);
         entities[0].setName("Bob");
         entities[1].setName("bob");
@@ -173,20 +173,20 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
 
         ofy().save().entities(entities).now();
 
-        assertThat(getRepository().listByField("name", "Bob"))
+        assertThat(getRepository().findAllByField("name", "Bob"))
                 .containsExactlyInAnyOrder(entities[0])
                 .doesNotContain(entities[1], entities[2]);
     }
 
     @Test
-    public void listByField_willThrowException_whenFieldIsNull() throws Exception {
+    public void findAllByField_willThrowException_whenFieldIsNull() throws Exception {
         thrown.expect(NullPointerException.class);
 
-        getRepository().listByField(null, "Bob");
+        getRepository().findAllByField(null, "Bob");
     }
 
     @Test
-    public void listByField_willHandleNullSearch() throws Exception {
+    public void findAllByField_willHandleNullSearch() throws Exception {
         TestStringEntity[] entities = fixture.get(3);
         entities[0].setName(null);
         entities[1].setName("Bob");
@@ -194,13 +194,13 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
 
         ofy().save().entities(entities).now();
 
-        assertThat(getRepository().listByField("name", (Object) null))
+        assertThat(getRepository().findAllByField("name", (Object) null))
                 .contains(entities[0])
                 .doesNotContain(entities[1], entities[2]);
     }
 
     @Test
-    public void listByField_willReturnEmptyList_whenThereAreNoMatches() throws Exception {
+    public void findAllByField_willReturnEmptyList_whenThereAreNoMatches() throws Exception {
         TestStringEntity[] entities = fixture.get(3);
         entities[0].setName("Mark");
         entities[1].setName("Bob");
@@ -208,12 +208,12 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
 
         ofy().save().entities(entities).now();
 
-        assertThat(getRepository().listByField("name", "Greg"))
+        assertThat(getRepository().findAllByField("name", "Greg"))
                 .isEmpty();
     }
 
     @Test
-    public void listByField_willNotFail_whenSearchTypeDoesNotMatchFieldType() throws Exception {
+    public void findAllByField_willNotFail_whenSearchTypeDoesNotMatchFieldType() throws Exception {
         TestStringEntity[] entities = fixture.get(3);
         entities[0].setName("Mark");
         entities[1].setName("Bob");
@@ -221,12 +221,12 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
 
         ofy().save().entities(entities).now();
 
-        assertThat(getRepository().listByField("name", 1L))
+        assertThat(getRepository().findAllByField("name", 1L))
                 .isEmpty();
     }
 
     @Test
-    public void listByFieldCollection() throws Exception {
+    public void findAllByFieldCollection() throws Exception {
         TestStringEntity[] entities = fixture.get(5);
         entities[0].setName("Bob");
         entities[1].setName("Bob");
@@ -236,13 +236,13 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
 
         ofy().save().entities(entities).now();
 
-        assertThat(getRepository().listByField("name", Arrays.asList("Bob", "Mark")))
+        assertThat(getRepository().findAllByField("name", Arrays.asList("Bob", "Mark")))
                 .containsExactlyInAnyOrder(entities[0], entities[1], entities[3])
                 .doesNotContain(entities[2], entities[4]);
     }
 
     @Test
-    public void listByFieldCollection_willReturnEmptyList_whenFieldIsNull() throws Exception {
+    public void findAllByFieldCollection_willReturnEmptyList_whenFieldIsNull() throws Exception {
         TestStringEntity[] entities = fixture.get(5);
         entities[0].setName("Bob");
         entities[1].setName("Tabatha");
@@ -251,14 +251,14 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
 
         ofy().save().entities(entities).now();
 
-        List<TestStringEntity> result = getRepository().listByField(null, Arrays.asList("Bob", "Tabatha"));
+        List<TestStringEntity> result = getRepository().findAllByField(null, Arrays.asList("Bob", "Tabatha"));
 
         assertThat(result).isEmpty();
     }
 
 
     @Test
-    public void listByFieldCollection_willHandleNullSearch() throws Exception {
+    public void findAllByFieldCollection_willHandleNullSearch() throws Exception {
         TestStringEntity[] entities = fixture.get(5);
         entities[0].setName(null);
         entities[1].setName(null);
@@ -268,13 +268,13 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
 
         ofy().save().entities(entities).now();
 
-        assertThat(getRepository().listByField("name", Arrays.asList("Mark", null)))
+        assertThat(getRepository().findAllByField("name", Arrays.asList("Mark", null)))
                 .containsExactlyInAnyOrder(entities[0], entities[1], entities[3])
                 .doesNotContain(entities[2], entities[4]);
     }
 
     @Test
-    public void listByFieldCollection_willReturnEmptyList_whenThereAreNoMatches() throws Exception {
+    public void findAllByFieldCollection_willReturnEmptyList_whenThereAreNoMatches() throws Exception {
         TestStringEntity[] entities = fixture.get(3);
         entities[0].setName("Mark");
         entities[1].setName("Bob");
@@ -282,12 +282,12 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
 
         ofy().save().entities(entities).now();
 
-        assertThat(getRepository().listByField("name", Arrays.asList("Greg", "Tabatha")))
+        assertThat(getRepository().findAllByField("name", Arrays.asList("Greg", "Tabatha")))
                 .isEmpty();
     }
 
     @Test
-    public void listByFieldCollection_willNotFail_whenSearchTypeDoesNotMatchFieldType() throws Exception {
+    public void findAllByFieldCollection_willNotFail_whenSearchTypeDoesNotMatchFieldType() throws Exception {
         TestStringEntity[] entities = fixture.get(3);
         entities[0].setName("Mark");
         entities[1].setName("Bob");
@@ -295,12 +295,12 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
 
         ofy().save().entities(entities).now();
 
-        assertThat(getRepository().listByField("name", Arrays.asList(1L, 2L)))
+        assertThat(getRepository().findAllByField("name", Arrays.asList(1L, 2L)))
                 .isEmpty();
     }
 
     @Test
-    public void listByFieldVarargs() throws Exception {
+    public void findAllByFieldVarargs() throws Exception {
         TestStringEntity[] entities = fixture.get(5);
         entities[0].setName("Bob");
         entities[1].setName("Bob");
@@ -310,13 +310,13 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
 
         ofy().save().entities(entities).now();
 
-        assertThat(getRepository().listByField("name", "Bob", "Mark"))
+        assertThat(getRepository().findAllByField("name", "Bob", "Mark"))
                 .containsExactlyInAnyOrder(entities[0], entities[1], entities[3])
                 .doesNotContain(entities[2], entities[4]);
     }
 
     @Test
-    public void listByFieldVarargs_willReturnEmptyList_whenFieldIsNull() throws Exception {
+    public void findAllByFieldVarargs_willReturnEmptyList_whenFieldIsNull() throws Exception {
         TestStringEntity[] entities = fixture.get(5);
         entities[0].setName("Bob");
         entities[1].setName("Tabatha");
@@ -325,14 +325,14 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
 
         ofy().save().entities(entities).now();
 
-        List<TestStringEntity> result = getRepository().listByField(null, "Bob", "Tabatha");
+        List<TestStringEntity> result = getRepository().findAllByField(null, "Bob", "Tabatha");
 
         assertThat(result).isEmpty();
     }
 
 
     @Test
-    public void listByFieldVarargs_willHandleNullSearch() throws Exception {
+    public void findAllByFieldVarargs_willHandleNullSearch() throws Exception {
         TestStringEntity[] entities = fixture.get(5);
         entities[0].setName(null);
         entities[1].setName(null);
@@ -342,13 +342,13 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
 
         ofy().save().entities(entities).now();
 
-        assertThat(getRepository().listByField("name", "Mark", null))
+        assertThat(getRepository().findAllByField("name", "Mark", null))
                 .containsExactlyInAnyOrder(entities[0], entities[1], entities[3])
                 .doesNotContain(entities[2], entities[4]);
     }
 
     @Test
-    public void listByFieldVarargs_willReturnEmptyList_whenThereAreNoMatches() throws Exception {
+    public void findAllByFieldVarargs_willReturnEmptyList_whenThereAreNoMatches() throws Exception {
         TestStringEntity[] entities = fixture.get(3);
         entities[0].setName("Mark");
         entities[1].setName("Bob");
@@ -356,12 +356,12 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
 
         ofy().save().entities(entities).now();
 
-        assertThat(getRepository().listByField("name", "Greg", "Tabatha"))
+        assertThat(getRepository().findAllByField("name", "Greg", "Tabatha"))
                 .isEmpty();
     }
 
     @Test
-    public void listByFieldVarargs_willNotFail_whenSearchTypeDoesNotMatchFieldType() throws Exception {
+    public void findAllByFieldVarargs_willNotFail_whenSearchTypeDoesNotMatchFieldType() throws Exception {
         TestStringEntity[] entities = fixture.get(3);
         entities[0].setName("Mark");
         entities[1].setName("Bob");
@@ -369,7 +369,7 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
 
         ofy().save().entities(entities).now();
 
-        assertThat(getRepository().listByField("name", 1L, 2L))
+        assertThat(getRepository().findAllByField("name", 1L, 2L))
                 .isEmpty();
     }
 

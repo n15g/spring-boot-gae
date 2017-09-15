@@ -65,7 +65,7 @@ public interface Repository<E, I extends Serializable> extends AsyncRepository<E
      * @return List of entities.
      */
     @Nonnull
-    default List<E> list() {
+    default List<E> findAll() {
         return ofy()
                 .load()
                 .type(getEntityType())
@@ -80,7 +80,7 @@ public interface Repository<E, I extends Serializable> extends AsyncRepository<E
      * @return List of entities.
      */
     @Nonnull
-    default List<E> list(int limit) {
+    default List<E> findAll(int limit) {
         return ofy()
                 .load()
                 .type(getEntityType())
@@ -98,7 +98,7 @@ public interface Repository<E, I extends Serializable> extends AsyncRepository<E
      * @return List of entities matching the given value.
      */
     @Nonnull
-    default List<E> listByField(String field, @Nullable Object value) {
+    default List<E> findAllByField(String field, @Nullable Object value) {
         return ofy()
                 .load()
                 .type(getEntityType())
@@ -116,7 +116,7 @@ public interface Repository<E, I extends Serializable> extends AsyncRepository<E
      * @return List of entities matching the given values.
      */
     @Nonnull
-    default List<E> listByField(String field, List<?> values) {
+    default List<E> findAllByField(String field, List<?> values) {
         return ofy()
                 .load()
                 .type(getEntityType())
@@ -134,8 +134,8 @@ public interface Repository<E, I extends Serializable> extends AsyncRepository<E
      * @return List of entities matching the given values.
      */
     @Nonnull
-    default List<E> listByField(String field, Object... values) {
-        return listByField(field, Arrays.asList(values));
+    default List<E> findAllByField(String field, Object... values) {
+        return findAllByField(field, Arrays.asList(values));
     }
 
     /**
