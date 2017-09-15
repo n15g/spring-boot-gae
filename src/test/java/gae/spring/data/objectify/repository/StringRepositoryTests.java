@@ -151,6 +151,145 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
     }
 
     @Test
+    public void findAllCollection() throws Exception {
+        TestStringEntity[] entities = fixture.get(3);
+        ofy().save().entities(entities).now();
+
+        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = getRepository().findAll(
+                Arrays.asList(
+                        Key.create(TestStringEntity.class, "id1"),
+                        Key.create(TestStringEntity.class, "id2"),
+                        Key.create(TestStringEntity.class, "id3")
+                )
+        );
+
+        assertThat(result)
+                .isNotNull()
+                .hasSize(3)
+                .containsEntry(Key.create(TestStringEntity.class, "id1"), Optional.of(entities[0]))
+                .containsEntry(Key.create(TestStringEntity.class, "id2"), Optional.of(entities[1]))
+                .containsEntry(Key.create(TestStringEntity.class, "id3"), Optional.of(entities[2]));
+    }
+
+    @Test
+    public void findAllCollection_willReturnEmpty_whenNoKeysArePassed() throws Exception {
+        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = getRepository().findAll(
+                Collections.emptyList()
+        );
+
+        assertThat(result)
+                .isNotNull()
+                .isEmpty();
+    }
+
+    @Test
+    public void findAllCollection_willNotContainMissingEntities_whenKeyDoesNotExist() throws Exception {
+        TestStringEntity[] entities = fixture.get(2);
+        ofy().save().entities(entities).now();
+
+        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = getRepository().findAll(
+                Arrays.asList(
+                        Key.create(TestStringEntity.class, "id1"),
+                        Key.create(TestStringEntity.class, "id2"),
+                        Key.create(TestStringEntity.class, "id100")
+                )
+        );
+
+        assertThat(result)
+                .isNotNull()
+                .hasSize(2)
+                .containsEntry(Key.create(TestStringEntity.class, "id1"), Optional.of(entities[0]))
+                .containsEntry(Key.create(TestStringEntity.class, "id2"), Optional.of(entities[1]))
+                .doesNotContainKey(Key.create(TestStringEntity.class, "id100"));
+    }
+
+    @Test
+    public void findAllCollection_willThrowException_whenInputIsNull() throws Exception {
+        thrown.expect(NullPointerException.class);
+        getRepository().findAll((Collection<Key<TestStringEntity>>) null);
+    }
+
+    @Test
+    public void findAllCollection_willThrowException_whenInputContainsNull() throws Exception {
+        thrown.expect(NullPointerException.class);
+        getRepository().findAll(
+                Arrays.asList(
+                        Key.create(TestStringEntity.class, "id1"),
+                        Key.create(TestStringEntity.class, "id2"),
+                        null
+                )
+        );
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void findAllVarargs() throws Exception {
+        TestStringEntity[] entities = fixture.get(3);
+        ofy().save().entities(entities).now();
+
+        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = getRepository().findAll(
+                Key.create(TestStringEntity.class, "id1"),
+                Key.create(TestStringEntity.class, "id2"),
+                Key.create(TestStringEntity.class, "id3")
+        );
+
+        assertThat(result)
+                .isNotNull()
+                .hasSize(3)
+                .containsEntry(Key.create(TestStringEntity.class, "id1"), Optional.of(entities[0]))
+                .containsEntry(Key.create(TestStringEntity.class, "id2"), Optional.of(entities[1]))
+                .containsEntry(Key.create(TestStringEntity.class, "id3"), Optional.of(entities[2]));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void findAllVarargs_willReturnEmpty_whenNoKeysArePassed() throws Exception {
+        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = getRepository().findAll((Key<TestStringEntity>[]) new Key[]{});
+
+        assertThat(result)
+                .isNotNull()
+                .isEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void findAllVarargs_willNotContainMissingEntities_whenKeyDoesNotExist() throws Exception {
+        TestStringEntity[] entities = fixture.get(2);
+        ofy().save().entities(entities).now();
+
+        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = getRepository().findAll(
+                Key.create(TestStringEntity.class, "id1"),
+                Key.create(TestStringEntity.class, "id2"),
+                Key.create(TestStringEntity.class, "id100")
+        );
+
+        assertThat(result)
+                .isNotNull()
+                .hasSize(2)
+                .containsEntry(Key.create(TestStringEntity.class, "id1"), Optional.of(entities[0]))
+                .containsEntry(Key.create(TestStringEntity.class, "id2"), Optional.of(entities[1]))
+                .doesNotContainKey(Key.create(TestStringEntity.class, "id100"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void findAllVarargs_willThrowException_whenInputIsNull() throws Exception {
+        thrown.expect(NullPointerException.class);
+        getRepository().findAll((Key<TestStringEntity>) null);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void findAllVarargs_willThrowException_whenInputContainsNull() throws Exception {
+        thrown.expect(NullPointerException.class);
+        getRepository().findAll(
+                Key.create(TestStringEntity.class, "id1"),
+                Key.create(TestStringEntity.class, "id2"),
+                null
+        );
+    }
+
+    @Test
     public void findAllByField() throws Exception {
         TestStringEntity[] entities = fixture.get(3);
         entities[0].setName("Bob");
@@ -374,158 +513,11 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
     }
 
     @Test
-    public void get() throws Exception {
+    public void findOne() throws Exception {
         TestStringEntity entity = new TestStringEntity("id").setName("the name");
         ofy().save().entity(entity).now();
 
-        TestStringEntity result = getRepository().get(Key.create(TestStringEntity.class, "id"));
-        assertThat(result).isNotNull()
-                .hasFieldOrPropertyWithValue("id", "id")
-                .hasFieldOrPropertyWithValue("name", "the name");
-    }
-
-    @Test
-    public void get_willThrowException_whenInputIsNull() throws Exception {
-        thrown.expect(NullPointerException.class);
-        getRepository().get((Key<TestStringEntity>) null);
-    }
-
-    @Test
-    public void get_willThrowException_whenKeyDoesNotExist() throws Exception {
-        thrown.expect(EntityNotFoundException.class);
-        thrown.expectMessage("No entity was found");
-        getRepository().get(Key.create(TestStringEntity.class, "bad-id"));
-    }
-
-    @Test
-    public void getCollection() throws Exception {
-        TestStringEntity[] entities = fixture.get(3);
-        ofy().save().entities(entities).now();
-
-        Map<Key<TestStringEntity>, TestStringEntity> result = getRepository().get(
-                Arrays.asList(
-                        Key.create(TestStringEntity.class, "id1"),
-                        Key.create(TestStringEntity.class, "id2"),
-                        Key.create(TestStringEntity.class, "id3")
-                )
-        );
-
-        assertThat(result)
-                .isNotNull()
-                .hasSize(3)
-                .containsEntry(Key.create(TestStringEntity.class, "id1"), entities[0])
-                .containsEntry(Key.create(TestStringEntity.class, "id2"), entities[1])
-                .containsEntry(Key.create(TestStringEntity.class, "id3"), entities[2]);
-    }
-
-    @Test
-    public void getCollection_willReturnEmpty_whenNoKeysArePassed() throws Exception {
-        Map<Key<TestStringEntity>, TestStringEntity> result = getRepository().get(
-                Collections.emptyList()
-        );
-
-        assertThat(result)
-                .isNotNull()
-                .isEmpty();
-    }
-
-    @Test
-    public void getCollection_willThrowException_whenInputIsNull() throws Exception {
-        thrown.expect(NullPointerException.class);
-        getRepository().get((Collection<Key<TestStringEntity>>) null);
-    }
-
-    @Test
-    public void getCollection_willThrowException_whenInputContainsNull() throws Exception {
-        thrown.expect(NullPointerException.class);
-        getRepository().get(
-                Arrays.asList(
-                        Key.create(TestStringEntity.class, "id1"),
-                        Key.create(TestStringEntity.class, "id2"),
-                        null
-                )
-        );
-    }
-
-    @Test
-    public void getCollection_willThrowException_whenKeyDoesNotExist() throws Exception {
-        thrown.expect(EntityNotFoundException.class);
-        thrown.expectMessage("No entity was found");
-        getRepository().get(
-                Arrays.asList(
-                        Key.create(TestStringEntity.class, "id1"),
-                        Key.create(TestStringEntity.class, "id2"),
-                        Key.create(TestStringEntity.class, "id100")
-                )
-        );
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void getVarargs() throws Exception {
-        TestStringEntity[] entities = fixture.get(3);
-        ofy().save().entities(entities).now();
-
-        Map<Key<TestStringEntity>, TestStringEntity> result = getRepository().get(
-                Key.create(TestStringEntity.class, "id1"),
-                Key.create(TestStringEntity.class, "id2"),
-                Key.create(TestStringEntity.class, "id3")
-        );
-
-        assertThat(result)
-                .isNotNull()
-                .hasSize(3)
-                .containsEntry(Key.create(TestStringEntity.class, "id1"), entities[0])
-                .containsEntry(Key.create(TestStringEntity.class, "id2"), entities[1])
-                .containsEntry(Key.create(TestStringEntity.class, "id3"), entities[2]);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void getVarargs_willReturnEmpty_whenNoKeysArePassed() throws Exception {
-        Map<Key<TestStringEntity>, TestStringEntity> result = getRepository().get();
-
-        assertThat(result)
-                .isNotNull()
-                .isEmpty();
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void getVarargs_willThrowException_whenInputIsNull() throws Exception {
-        thrown.expect(NullPointerException.class);
-        getRepository().get((Key<TestStringEntity>) null);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void getVarargs_willThrowException_whenInputContainsNull() throws Exception {
-        thrown.expect(NullPointerException.class);
-        getRepository().get(
-                Key.create(TestStringEntity.class, "id1"),
-                Key.create(TestStringEntity.class, "id2"),
-                null
-        );
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void getVarargs_willThrowException_whenKeyDoesNotExist() throws Exception {
-        thrown.expect(EntityNotFoundException.class);
-        thrown.expectMessage("No entity was found");
-        getRepository().get(
-                Key.create(TestStringEntity.class, "id1"),
-                Key.create(TestStringEntity.class, "id2"),
-                Key.create(TestStringEntity.class, "id100")
-        );
-    }
-
-    @Test
-    public void tryGet() throws Exception {
-        TestStringEntity entity = new TestStringEntity("id").setName("the name");
-        ofy().save().entity(entity).now();
-
-        Optional<TestStringEntity> result = getRepository().tryGet(Key.create(TestStringEntity.class, "id"));
+        Optional<TestStringEntity> result = getRepository().findOne(Key.create(TestStringEntity.class, "id"));
         assertThat(result.get())
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("id", "id")
@@ -533,156 +525,17 @@ public abstract class StringRepositoryTests extends StringAsyncRepositoryTests {
     }
 
     @Test
-    public void tryGet_willReturnEmptyOptional_whenKeyDoesNotExist() throws Exception {
-        Optional<TestStringEntity> result = getRepository().tryGet(Key.create(TestStringEntity.class, "bad-id"));
+    public void findOne_willReturnEmptyOptional_whenKeyDoesNotExist() throws Exception {
+        Optional<TestStringEntity> result = getRepository().findOne(Key.create(TestStringEntity.class, "bad-id"));
 
         assertThat(result.isPresent()).isEqualTo(false);
     }
 
 
     @Test
-    public void tryGet_willThrowException_whenInputIsNull() throws Exception {
+    public void findOne_willThrowException_whenInputIsNull() throws Exception {
         thrown.expect(NullPointerException.class);
-        getRepository().tryGet((Key<TestStringEntity>) null);
-    }
-
-    @Test
-    public void tryGetCollection() throws Exception {
-        TestStringEntity[] entities = fixture.get(3);
-        ofy().save().entities(entities).now();
-
-        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = getRepository().tryGet(
-                Arrays.asList(
-                        Key.create(TestStringEntity.class, "id1"),
-                        Key.create(TestStringEntity.class, "id2"),
-                        Key.create(TestStringEntity.class, "id3")
-                )
-        );
-
-        assertThat(result)
-                .isNotNull()
-                .hasSize(3)
-                .containsEntry(Key.create(TestStringEntity.class, "id1"), Optional.of(entities[0]))
-                .containsEntry(Key.create(TestStringEntity.class, "id2"), Optional.of(entities[1]))
-                .containsEntry(Key.create(TestStringEntity.class, "id3"), Optional.of(entities[2]));
-    }
-
-    @Test
-    public void tryGetCollection_willReturnEmpty_whenNoKeysArePassed() throws Exception {
-        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = getRepository().tryGet(
-                Collections.emptyList()
-        );
-
-        assertThat(result)
-                .isNotNull()
-                .isEmpty();
-    }
-
-    @Test
-    public void tryGetCollection_willNotContainMissingEntities_whenKeyDoesNotExist() throws Exception {
-        TestStringEntity[] entities = fixture.get(2);
-        ofy().save().entities(entities).now();
-
-        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = getRepository().tryGet(
-                Arrays.asList(
-                        Key.create(TestStringEntity.class, "id1"),
-                        Key.create(TestStringEntity.class, "id2"),
-                        Key.create(TestStringEntity.class, "id100")
-                )
-        );
-
-        assertThat(result)
-                .isNotNull()
-                .hasSize(2)
-                .containsEntry(Key.create(TestStringEntity.class, "id1"), Optional.of(entities[0]))
-                .containsEntry(Key.create(TestStringEntity.class, "id2"), Optional.of(entities[1]))
-                .doesNotContainKey(Key.create(TestStringEntity.class, "id100"));
-    }
-
-    @Test
-    public void tryGetCollection_willThrowException_whenInputIsNull() throws Exception {
-        thrown.expect(NullPointerException.class);
-        getRepository().tryGet((Collection<Key<TestStringEntity>>) null);
-    }
-
-    @Test
-    public void tryGetCollection_willThrowException_whenInputContainsNull() throws Exception {
-        thrown.expect(NullPointerException.class);
-        getRepository().tryGet(
-                Arrays.asList(
-                        Key.create(TestStringEntity.class, "id1"),
-                        Key.create(TestStringEntity.class, "id2"),
-                        null
-                )
-        );
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void tryGetVarargs() throws Exception {
-        TestStringEntity[] entities = fixture.get(3);
-        ofy().save().entities(entities).now();
-
-        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = getRepository().tryGet(
-                Key.create(TestStringEntity.class, "id1"),
-                Key.create(TestStringEntity.class, "id2"),
-                Key.create(TestStringEntity.class, "id3")
-        );
-
-        assertThat(result)
-                .isNotNull()
-                .hasSize(3)
-                .containsEntry(Key.create(TestStringEntity.class, "id1"), Optional.of(entities[0]))
-                .containsEntry(Key.create(TestStringEntity.class, "id2"), Optional.of(entities[1]))
-                .containsEntry(Key.create(TestStringEntity.class, "id3"), Optional.of(entities[2]));
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void tryGetVarargs_willReturnEmpty_whenNoKeysArePassed() throws Exception {
-        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = getRepository().tryGet();
-
-        assertThat(result)
-                .isNotNull()
-                .isEmpty();
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void tryGetVarargs_willNotContainMissingEntities_whenKeyDoesNotExist() throws Exception {
-        TestStringEntity[] entities = fixture.get(2);
-        ofy().save().entities(entities).now();
-
-        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = getRepository().tryGet(
-                Key.create(TestStringEntity.class, "id1"),
-                Key.create(TestStringEntity.class, "id2"),
-                Key.create(TestStringEntity.class, "id100")
-        );
-
-        assertThat(result)
-                .isNotNull()
-                .hasSize(2)
-                .containsEntry(Key.create(TestStringEntity.class, "id1"), Optional.of(entities[0]))
-                .containsEntry(Key.create(TestStringEntity.class, "id2"), Optional.of(entities[1]))
-                .doesNotContainKey(Key.create(TestStringEntity.class, "id100"));
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void tryGetVarargs_willThrowException_whenInputIsNull() throws Exception {
-        thrown.expect(NullPointerException.class);
-        getRepository().tryGet((Key<TestStringEntity>) null);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void tryGetVarargs_willThrowException_whenInputContainsNull() throws Exception {
-        thrown.expect(NullPointerException.class);
-        getRepository().tryGet(
-                Key.create(TestStringEntity.class, "id1"),
-                Key.create(TestStringEntity.class, "id2"),
-                null
-        );
+        getRepository().findOne(null);
     }
 
     @Test

@@ -89,6 +89,37 @@ public interface Repository<E, I extends Serializable> extends AsyncRepository<E
     }
 
     /**
+     * Get the entities with the given keys, if they exist.
+     *
+     * @param keys List of keys to load.
+     * @return A map of loaded entities keyed by the entity key.
+     */
+    @Nonnull
+    default Map<Key<E>, Optional<E>> findAll(Collection<Key<E>> keys) {
+        return ofy()
+                .load()
+                .keys(keys)
+                .entrySet()
+                .parallelStream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> Optional.ofNullable(entry.getValue())
+                ));
+    }
+
+    /**
+     * Get the entities with the given keys, if they exist.
+     *
+     * @param keys List of keys to load.
+     * @return A map of loaded entities keyed by the entity key.
+     */
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    default Map<Key<E>, Optional<E>> findAll(Key<E>... keys) {
+        return findAll(Arrays.asList(keys));
+    }
+
+    /**
      * Get all entities whose field has the value of the given object.
      * Note that the given field must be indexed for anything to be returned.
      * This will load all entities into memory, so should only be used where the number of entities is constrained.
@@ -142,100 +173,16 @@ public interface Repository<E, I extends Serializable> extends AsyncRepository<E
      * Get the entity with the given key.
      *
      * @param key The key.
-     * @return The entity.
-     * @throws EntityNotFoundException If no entity can be found for the given key.
+     * @return The entity or an empty {@link Optional} if none exists.
      */
     @Nonnull
-    default E get(Key<E> key) {
-        Optional<E> result = tryGet(key);
-
-        if (result.isPresent()) {
-            return result.get();
-        }
-
-        throw new EntityNotFoundException(key);
-    }
-
-    /**
-     * Get the entities with the given keys.
-     *
-     * @param keys List of keys to load.
-     * @return A map of loaded entities keyed by the entity key.
-     * @throws EntityNotFoundException If no entity can be found for a given key.
-     */
-    @Nonnull
-    default Map<Key<E>, E> get(Collection<Key<E>> keys) {
-        final Map<Key<E>, E> result = ofy()
-                .load()
-                .keys(keys);
-
-        keys.forEach(key -> {
-            if (result.get(key) == null) {
-                throw new EntityNotFoundException(key);
-            }
-        });
-
-        return result;
-    }
-
-    /**
-     * Get the entities with the given keys.
-     *
-     * @param keys List of keys to load.
-     * @return A map of loaded entities keyed by the entity key.
-     * @throws EntityNotFoundException If no entity can be found for a given key.
-     */
-    @Nonnull
-    @SuppressWarnings("unchecked")
-    default Map<Key<E>, E> get(Key<E>... keys) {
-        return get(Arrays.asList(keys));
-    }
-
-    /**
-     * Get the entity with the given key, if it exists.
-     *
-     * @param key The key.
-     * @return The entity.
-     */
-    @Nonnull
-    default Optional<E> tryGet(Key<E> key) {
+    default Optional<E> findOne(Key<E> key) {
         return Optional.ofNullable(
                 ofy()
                         .load()
                         .key(key)
                         .now()
         );
-    }
-
-    /**
-     * Get the entities with the given keys, if they exist.
-     *
-     * @param keys List of keys to load.
-     * @return A map of loaded entities keyed by the entity key.
-     */
-    @Nonnull
-    default Map<Key<E>, Optional<E>> tryGet(Collection<Key<E>> keys) {
-        return ofy()
-                .load()
-                .keys(keys)
-                .entrySet()
-                .parallelStream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> Optional.ofNullable(entry.getValue())
-                ));
-    }
-
-    /**
-     * Get the entities with the given keys, if they exist.
-     *
-     * @param keys List of keys to load.
-     * @return A map of loaded entities keyed by the entity key.
-     */
-    @Nonnull
-    @SuppressWarnings("unchecked")
-    default Map<Key<E>, Optional<E>> tryGet(Key<E>... keys) {
-        return tryGet(Arrays.asList(keys));
     }
 
     /**
