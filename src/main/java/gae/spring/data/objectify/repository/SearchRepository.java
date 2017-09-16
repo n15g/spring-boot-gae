@@ -1,11 +1,13 @@
 package gae.spring.data.objectify.repository;
 
 import com.googlecode.objectify.Key;
+import gae.spring.data.objectify.search.Query;
 import gae.spring.data.objectify.search.SearchIndex;
 import gae.spring.data.objectify.search.SearchService;
-import gae.spring.data.objectify.search.Query;
+import org.springframework.data.repository.NoRepositoryBean;
 
 import javax.annotation.Nonnull;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,8 +22,8 @@ import java.util.function.Supplier;
  * @param <E> Entity type.
  * @param <I> Entity Id Type.
  */
-
-public interface SearchRepository<E, I> extends Repository<E, I> {
+@NoRepositoryBean
+public interface SearchRepository<E, I extends Serializable> extends Repository<E, I> {
 
     /**
      * @return Search service.

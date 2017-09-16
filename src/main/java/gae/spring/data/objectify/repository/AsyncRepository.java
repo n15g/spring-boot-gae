@@ -3,8 +3,11 @@ package gae.spring.data.objectify.repository;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Result;
+import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.data.repository.Repository;
 
 import javax.annotation.Nonnull;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,7 +24,8 @@ import java.util.function.Supplier;
  * @param <E> The entity type
  * @param <I> The id type of the entity
  */
-public interface AsyncRepository<E, I> extends EntityManager<E, I> {
+@NoRepositoryBean
+public interface AsyncRepository<E, I extends Serializable> extends EntityManager<E, I>, Repository<E, I> {
 
     /**
      * Put an entity asynchronously asynchronously.

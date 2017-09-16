@@ -4,6 +4,7 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Work;
+import gae.spring.data.objectify.config.ObjectifyAutoConfiguration;
 
 import java.io.Closeable;
 import java.util.Arrays;

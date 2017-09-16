@@ -1,15 +1,17 @@
-package gae.spring.data.objectify;
+package gae.spring.data.objectify.config;
 
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFilter;
 import com.googlecode.objectify.impl.translate.Translators;
 import com.googlecode.objectify.impl.translate.opt.BigDecimalLongTranslatorFactory;
+import gae.spring.data.objectify.ObjectifyProxy;
 import gae.spring.data.objectify.translator.Jsr310Translators;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import java.util.List;
 @Configuration
 @ConditionalOnClass(Objectify.class)
 @ConditionalOnMissingBean(ObjectifyProxy.class)
+@Import(ObjectifyRepositoriesAutoConfigurationRegistrar.class)
 public class ObjectifyAutoConfiguration {
 
     List<ObjectifyConfigurer> configurers = new ArrayList<>();

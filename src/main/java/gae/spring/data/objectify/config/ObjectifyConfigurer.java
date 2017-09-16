@@ -1,4 +1,4 @@
-package gae.spring.data.objectify;
+package gae.spring.data.objectify.config;
 
 import com.googlecode.objectify.impl.translate.TranslatorFactory;
 
