@@ -1,12 +1,13 @@
-# Spring Data Objectify
+# Spring Data GCP
 
-## Prerequisites
+Support for Google Cloud Platform's Datastore via Objectify and the full-text search service running in an
+AppEngine standard environment.
 
-Before you can run this app up you'll need to check you have the following tools:
+## Requirements
 
 * Java 8+
 * Gradle 4+ (if you don't want to use the wrapper)
-* Appengine Standard Java 8
+* Appengine Standard Java 8+
 
 This library has been designed to work with the new Java8 Appengine Standard Environment. It will not work
 when deployed to the Java 7 standard environment.
