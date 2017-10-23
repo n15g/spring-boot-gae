@@ -2,6 +2,7 @@ package contrib.springframework.data.gcp.search.metadata.impl;
 
 import contrib.springframework.data.gcp.search.IndexType;
 import contrib.springframework.data.gcp.search.metadata.Accessor;
+import contrib.springframework.data.gcp.search.metadata.IndexNamingStrategy;
 import contrib.springframework.data.gcp.search.metadata.IndexTypeRegistry;
 import contrib.springframework.data.gcp.search.metadata.SearchMetadata;
 
@@ -13,14 +14,17 @@ import java.util.Map;
  */
 public class SearchMetadataImpl implements SearchMetadata {
     private final AccessorRegistry accessorRegistry;
+    private final IndexNamingStrategy namingStrategy;
 
     /**
      * Create a new instance.
      *
      * @param indexTypeRegistry Lookup used to determine index type for a field.
+     * @param namingStrategy    The index naming strategy.
      */
-    public SearchMetadataImpl(IndexTypeRegistry indexTypeRegistry) {
+    public SearchMetadataImpl(IndexTypeRegistry indexTypeRegistry, IndexNamingStrategy namingStrategy) {
         this.accessorRegistry = new AccessorRegistryImpl(indexTypeRegistry);
+        this.namingStrategy = namingStrategy;
     }
 
     @Override
@@ -29,6 +33,11 @@ public class SearchMetadataImpl implements SearchMetadata {
         return (I) accessorRegistry
                 .getIdAccessor(entity.getClass())
                 .getValue(entity);
+    }
+
+    @Override
+    public <E> String getIndexName(Class<E> entityClass) {
+        return namingStrategy.apply(entityClass);
     }
 
     @Override

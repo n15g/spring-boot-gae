@@ -1,6 +1,7 @@
 package contrib.springframework.data.gcp.objectify;
 
 import com.googlecode.objectify.Objectify;
+import contrib.springframework.data.gcp.SetupAppengine;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;

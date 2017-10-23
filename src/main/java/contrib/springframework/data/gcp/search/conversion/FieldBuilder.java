@@ -2,10 +2,14 @@ package contrib.springframework.data.gcp.search.conversion;
 
 import com.google.appengine.api.search.Field;
 import com.google.appengine.api.search.GeoPoint;
+import contrib.springframework.data.gcp.search.IndexException;
 import contrib.springframework.data.gcp.search.IndexType;
 import contrib.springframework.data.gcp.search.metadata.Accessor;
+import contrib.springframework.data.gcp.search.metadata.impl.MetadataUtils;
 import org.springframework.core.convert.ConversionService;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,9 +19,12 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
+import static contrib.springframework.data.gcp.search.IndexType.DATE;
+import static contrib.springframework.data.gcp.search.IndexType.NUMBER;
+import static java.util.Collections.emptyList;
+
 /**
  * Build an array of search service {@link Field}s from a field {@link Accessor}.
- * If the value of the field the accessor
  */
 public class FieldBuilder implements BiFunction<Accessor, Object, List<Field>> {
 
@@ -33,8 +40,10 @@ public class FieldBuilder implements BiFunction<Accessor, Object, List<Field>> {
     }
 
     @Override
-    public List<Field> apply(Accessor accessor, Object entity) {
-        Collection<?> values = values(accessor.getValue(entity));
+    public List<Field> apply(Accessor accessor, @Nullable Object fieldValue) {
+        assertSupportedMultiplicity(accessor, fieldValue);
+
+        Collection<?> values = toValueList(fieldValue);
         BiConsumer<Field.Builder, Object> mutator = getMutator(accessor.getIndexType());
 
         return values.stream()
@@ -46,11 +55,35 @@ public class FieldBuilder implements BiFunction<Accessor, Object, List<Field>> {
                 }).collect(Collectors.toList());
     }
 
-    private Collection values(Object value) {
+    /**
+     * Search only supports multiple values if the index type is not {@link IndexType#NUMBER} or {@link IndexType#DATE}.
+     * See https://cloud.google.com/appengine/docs/standard/java/search/ - Multi-valued fields.
+     *
+     * @param accessor   Field accessor.
+     * @param fieldValue The value of the field.
+     */
+    private void assertSupportedMultiplicity(Accessor accessor, @Nullable Object fieldValue) {
+        if (fieldValue == null) {
+            return;
+        }
+
+        IndexType indexType = accessor.getIndexType();
+
+        if (MetadataUtils.isCollectionType(fieldValue.getClass())
+                && (indexType == NUMBER || indexType == DATE)) {
+            throw new IndexException("Search does not support multiplicity on NUMBER or DATE index types. Offending member: " + accessor.getMember());
+        }
+    }
+
+    @Nonnull
+    private Collection toValueList(@Nullable Object value) {
+        if (value == null) {
+            return emptyList();
+        }
         if (value.getClass().isArray()) {
             return Arrays.asList((Object[]) value);
         } else {
-            if (value.getClass().isAssignableFrom(Collection.class)) {
+            if (Collection.class.isAssignableFrom(value.getClass())) {
                 return (Collection) value;
             }
         }
@@ -67,7 +100,7 @@ public class FieldBuilder implements BiFunction<Accessor, Object, List<Field>> {
             case HTML:
                 return this::setHtml;
             case DATE:
-                return this::setNumber;
+                return this::setDate;
             case GEOPOINT:
                 return this::setGeopoint;
             default:

@@ -1,4 +1,4 @@
-package contrib.springframework.data.gcp.objectify;
+package contrib.springframework.data.gcp;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;

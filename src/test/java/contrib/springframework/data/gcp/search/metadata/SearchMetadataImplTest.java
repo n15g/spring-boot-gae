@@ -30,13 +30,16 @@ public class SearchMetadataImplTest {
     @Mock
     private IndexTypeRegistry indexTypeRegistry;
 
+    @Mock
+    private IndexNamingStrategy indexNamingStrategy;
+
     private SearchMetadata searchMetadata;
 
     @Before
     public void setUp() throws Exception {
         searchMetadata = Mockito.spy(new SearchMetadataImpl(
-                indexTypeRegistry
-        ));
+                indexTypeRegistry,
+                indexNamingStrategy));
     }
 
     @Test
@@ -62,10 +65,10 @@ public class SearchMetadataImplTest {
     public void getSearchFieldValues() throws Exception {
         TestSearchEntity entity = new TestSearchEntity("id")
                 .setStringField("stringValue")
+                .setStringArrayField(new String[]{"one", "two", "three"})
+                .setStringListField(Arrays.asList("10", "9", "8"))
                 .setLongField(1234567890L)
                 .setGeoPointField(new GeoPoint(1.1, 2.2))
-                .setStringArrayField(new String[]{"one", "two", "three"})
-                .setLongListField(Arrays.asList(10L, 9L, 8L))
                 .setUnindexedValue("unindexedValue");
 
         Map<String, Accessor> result = searchMetadata.getSearchFields(entity);
@@ -74,10 +77,10 @@ public class SearchMetadataImplTest {
         assertThat(result.get("longField").getValue(entity)).isEqualTo(1234567890L);
         assertThat(result.get("geoPointField").getValue(entity)).isEqualTo(entity.getGeoPointField());
         assertThat(result.get("stringArrayField").getValue(entity)).isEqualTo(new String[]{"one", "two", "three"});
-        assertThat(result.get("longListField").getValue(entity)).isEqualTo(Arrays.asList(10L, 9L, 8L));
+        assertThat(result.get("stringListField").getValue(entity)).isEqualTo(Arrays.asList("10", "9", "8"));
         assertThat(result.get("stringMethod").getValue(entity)).isEqualTo("indexedMethodValue");
         assertThat(result.get("stringArrayMethod").getValue(entity)).isEqualTo(new String[]{"value1", "value2", "value3"});
-        assertThat(result.get("longListMethod").getValue(entity)).isEqualTo(Arrays.asList(1L, 2L, 3L));
+        assertThat(result.get("stringListMethod").getValue(entity)).isEqualTo(Arrays.asList("1", "2", "3"));
         assertThat(result).doesNotContainKeys("unindexedValue", "unindexedMethod");
     }
 
@@ -98,12 +101,12 @@ public class SearchMetadataImplTest {
         assertThat(searchMetadata.getFieldType(TestSearchEntity.class, "stringField")).isEqualTo(String.class);
         assertThat(searchMetadata.getFieldType(TestSearchEntity.class, "longField")).isEqualTo(long.class);
         assertThat(searchMetadata.getFieldType(TestSearchEntity.class, "stringArrayField")).isEqualTo(String[].class);
-        assertThat(searchMetadata.getFieldType(TestSearchEntity.class, "longListField"))
-                .isEqualTo(TestSearchEntity.class.getDeclaredField("longListField").getGenericType());
+        assertThat(searchMetadata.getFieldType(TestSearchEntity.class, "stringListField"))
+                .isEqualTo(TestSearchEntity.class.getDeclaredField("stringListField").getGenericType());
         assertThat(searchMetadata.getFieldType(TestSearchEntity.class, "stringMethod")).isEqualTo(String.class);
         assertThat(searchMetadata.getFieldType(TestSearchEntity.class, "stringArrayMethod")).isEqualTo(String[].class);
-        assertThat(searchMetadata.getFieldType(TestSearchEntity.class, "longListMethod"))
-                .isEqualTo(TestSearchEntity.class.getDeclaredMethod("longListMethod").getGenericReturnType());
+        assertThat(searchMetadata.getFieldType(TestSearchEntity.class, "stringListMethod"))
+                .isEqualTo(TestSearchEntity.class.getDeclaredMethod("stringListMethod").getGenericReturnType());
     }
 
     @Test

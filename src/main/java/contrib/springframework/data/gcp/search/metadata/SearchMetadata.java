@@ -4,6 +4,7 @@ import contrib.springframework.data.gcp.search.IndexType;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Holds metadata about a searchable entity.
@@ -22,12 +23,35 @@ public interface SearchMetadata {
     <E, I> I getId(E entity);
 
     /**
+     * Get the index name for the given entity class.
+     *
+     * @param entityClass The entity.
+     * @param <E>         Entity type.
+     * @return Index name.
+     */
+    <E> String getIndexName(Class<E> entityClass);
+
+    /**
      * Return a map of indexed field values for the given entity.
      *
      * @param entity The entity.
      * @return Map of field values.
      */
     Map<String, Accessor> getSearchFields(Object entity);
+
+    /**
+     * Get the accessors and field values for a given entity.
+     *
+     * @param entity The entity.
+     * @return Map of field values keyed by field accessor.
+     */
+    default Map<Accessor, Object> getFieldValues(Object entity) {
+        return getSearchFields(entity).entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getValue,
+                        entry -> entry.getValue().getValue(entity)
+                ));
+    }
 
     /**
      * Encode the name of a field for use in a search index.

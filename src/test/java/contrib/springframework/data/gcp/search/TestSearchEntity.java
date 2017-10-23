@@ -29,7 +29,7 @@ public class TestSearchEntity {
     @SearchIndex
     private String[] stringArrayField;
     @SearchIndex
-    private List<Long> longListField;
+    private List<String> stringListField;
 
     private String unindexedValue;
 
@@ -86,12 +86,12 @@ public class TestSearchEntity {
         return this;
     }
 
-    public List<Long> getLongListField() {
-        return longListField;
+    public List<String> getStringListField() {
+        return stringListField;
     }
 
-    public TestSearchEntity setLongListField(List<Long> longListField) {
-        this.longListField = longListField;
+    public TestSearchEntity setStringListField(List<String> stringListField) {
+        this.stringListField = stringListField;
         return this;
     }
 
@@ -115,8 +115,8 @@ public class TestSearchEntity {
     }
 
     @SearchIndex
-    public List<Long> longListMethod() {
-        return Arrays.asList(1L, 2L, 3L);
+    public List<String> stringListMethod() {
+        return Arrays.asList("1", "2", "3");
     }
 
 
