@@ -19,7 +19,7 @@ public class NoOpSearchService implements SearchService {
     }
 
     @Override
-    public <E, I> I getId(E entity) {
+    public <E> String getId(E entity) {
         return null;
     }
 
@@ -31,7 +31,7 @@ public class NoOpSearchService implements SearchService {
 
     @Nonnull
     @Override
-    public <E, I> Runnable index(E entity, I id) {
+    public <E> Runnable index(E entity, String id) {
         return doNothing();
     }
 
@@ -43,20 +43,18 @@ public class NoOpSearchService implements SearchService {
 
     @Nonnull
     @Override
-    public <E, I> Runnable index(Map<I, E> entities) {
+    public <E> Runnable index(Map<String, E> entities) {
         return doNothing();
     }
 
-    @Nonnull
     @Override
-    public <E, I> Runnable unindex(Class<E> entityClass, I id) {
-        return doNothing();
+    public <E> void unindex(Class<E> entityClass, String id) {
+        //no-op
     }
 
-    @Nonnull
     @Override
-    public <E, I> Runnable unindex(Class<E> entityClass, Collection<I> ids) {
-        return doNothing();
+    public <E> void unindex(Class<E> entityClass, Collection<String> ids) {
+        //no-op
     }
 
     @Override

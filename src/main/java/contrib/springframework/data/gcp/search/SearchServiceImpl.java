@@ -25,6 +25,7 @@ public class SearchServiceImpl implements SearchService {
 
     private final SearchMetadata searchMetadata;
     private final DocumentBuilder documentBuilder;
+    private final ConversionService conversionService;
 
     /**
      * Create a new instance.
@@ -34,7 +35,8 @@ public class SearchServiceImpl implements SearchService {
      */
     public SearchServiceImpl(SearchMetadata searchMetadata, ConversionService conversionService) {
         this.searchMetadata = searchMetadata;
-        documentBuilder = new DocumentBuilder(searchMetadata, conversionService);
+        this.conversionService = conversionService;
+        documentBuilder = new DocumentBuilder(searchMetadata, this.conversionService);
     }
 
     @Nonnull
@@ -44,13 +46,13 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public <E, I> I getId(E entity) {
+    public <E> String getId(E entity) {
         return searchMetadata.getId(entity);
     }
 
     @Nonnull
     @Override
-    public <E, I> Runnable index(E entity, I id) {
+    public <E> Runnable index(E entity, String id) {
         Index index = getIndex(entity.getClass());
         Document document = documentBuilder.apply(id, entity);
 
@@ -61,7 +63,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Nonnull
     @Override
-    public <E, I> Runnable index(Map<I, E> entities) {
+    public <E> Runnable index(Map<String, E> entities) {
         if (entities.isEmpty()) {
             return doNothing();
         } else {
@@ -78,16 +80,15 @@ public class SearchServiceImpl implements SearchService {
         }
     }
 
-    @Nonnull
     @Override
-    public <E, I> Runnable unindex(Class<E> entityClass, I id) {
-        throw new UnsupportedOperationException("Not implemented");//TODO: Not implemented
+    public <E> void unindex(Class<E> entityClass, String id) {
+        String idString = conversionService.convert(id, String.class);
+        getIndex(entityClass).delete(idString);
     }
 
-    @Nonnull
     @Override
-    public <E, I> Runnable unindex(Class<E> entityClass, Collection<I> ids) {
-        throw new UnsupportedOperationException("Not implemented");//TODO: Not implemented
+    public <E> void unindex(Class<E> entityClass, Collection<String> ids) {
+        getIndex(entityClass).delete(ids);
     }
 
     @Override

@@ -30,11 +30,10 @@ public interface SearchService {
      *
      * @param entity The entity.
      * @param <E>    Entity type.
-     * @param <I>    Id type.
      * @return Entity id.
      * @throws IllegalArgumentException If the given entity does not have a {@link SearchId} annotated field.
      */
-    <E, I> I getId(E entity);
+    <E> String getId(E entity);
 
     /**
      * Add an entity to the search indexes.
@@ -58,11 +57,10 @@ public interface SearchService {
      * @param entity The entity.
      * @param id     The id to store against.
      * @param <E>    Entity type.
-     * @param <I>    Id type.
      * @return Index operation completion hook.
      */
     @Nonnull
-    <E, I> Runnable index(E entity, I id);
+    <E> Runnable index(E entity, String id);
 
     /**
      * Add a collection of entities to the search indexes.
@@ -120,71 +118,48 @@ public interface SearchService {
      *
      * @param entities Map of entities keyed by the entity id.
      * @param <E>      Entity type.
-     * @param <I>      Entity id type.
      * @return Index operation completion hook.
      */
     @Nonnull
-    <E, I> Runnable index(Map<I, E> entities);
+    <E> Runnable index(Map<String, E> entities);
 
     /**
-     * Remove an entity from the search indexes by key.
-     * Note: The unindex operation is performed asynchronously. The returned {@link Runnable} can be invoked to
-     * wait for the operation to complete.
-     * <p>
+     * Remove an entity from the search indexes by id.
      *
      * @param entityClass Class of entity to unindex.
-     * @param key         The entity key.
-     * @param <I>         Entity id type.
-     * @return Index operation completion hook.
+     * @param id          The entity id.
      */
-    @Nonnull
-    <E, I> Runnable unindex(Class<E> entityClass, I key);
+    <E> void unindex(Class<E> entityClass, String id);
 
     /**
-     * Remove a collection of entities from the search indexes by key.
-     * Note: The unindex operation is performed asynchronously. The returned {@link Runnable} can be invoked to
-     * wait for the operation to complete.
+     * Remove a collection of entities from the search indexes by id.
      *
      * @param entityClass Class of entity to unindex.
      * @param ids         The entity ids.
      * @param <E>         Entity type.
-     * @param <I>         Id type.
-     * @return Index operation completion hook.
      */
-    @Nonnull
-    <E, I> Runnable unindex(Class<E> entityClass, Collection<I> ids);
+    <E> void unindex(Class<E> entityClass, Collection<String> ids);
 
     /**
-     * Remove a collection of entities from the search indexes by key.
-     * Note: The unindex operation is performed asynchronously. The returned {@link Runnable} can be invoked to
-     * wait for the operation to complete.
+     * Remove a collection of entities from the search indexes by id.
      *
      * @param entityClass Class of entity to unindex.
      * @param ids         The entity ids.
      * @param <E>         Entity type.
-     * @param <I>         Id type.
-     * @return Index operation completion hook.
      */
-    @Nonnull
-    default <E, I> Runnable unindex(Class<E> entityClass, Stream<I> ids) {
-        return unindex(entityClass, ids.collect(Collectors.toList()));
+    default <E> void unindex(Class<E> entityClass, Stream<String> ids) {
+        unindex(entityClass, ids.collect(Collectors.toList()));
     }
 
     /**
-     * Remove a collection of entities from the search indexes by key.
-     * Note: The unindex operation is performed asynchronously. The returned {@link Runnable} can be invoked to
-     * wait for the operation to complete.
+     * Remove a collection of entities from the search indexes by id.
      *
      * @param entityClass Class of entity to unindex.
      * @param ids         The entity ids.
      * @param <E>         Entity type.
-     * @param <I>         Id type.
-     * @return Index operation completion hook.
      */
-    @Nonnull
-    @SuppressWarnings("unchecked")
-    default <E, I> Runnable unindex(Class<E> entityClass, I... ids) {
-        return unindex(entityClass, Arrays.asList(ids));
+    default <E> void unindex(Class<E> entityClass, String... ids) {
+        unindex(entityClass, Arrays.asList(ids));
     }
 
     /**

@@ -58,4 +58,43 @@ public class SearchServiceImplTest extends SearchTest {
     public void indexMultiple_willNotFail_whenMapIsEmpty() {
         searchService.index(new HashMap<>()).run();
     }
+
+    @Test
+    public void unindex() {
+        Index index = getIndex(TestSearchEntity.class);
+
+        searchService.index(new TestSearchEntity("entity1"), new TestSearchEntity("entity2")).run();
+        assertThat(index.get("entity1")).isNotNull();
+        assertThat(index.get("entity2")).isNotNull();
+
+        searchService.unindex(TestSearchEntity.class, "entity1");
+        assertThat(index.get("entity1")).isNull();
+        assertThat(index.get("entity2")).isNotNull();
+    }
+
+    @Test
+    public void unindexMultiple() {
+        TestSearchEntity entity1 = new TestSearchEntity("entity1");
+        TestSearchEntity entity2 = new TestSearchEntity("entity2");
+        TestSearchEntity entity3 = new TestSearchEntity("entity3");
+
+        searchService.index(Arrays.asList(
+                entity1, entity2, entity3
+        )).run();
+
+        Index index = getIndex(TestSearchEntity.class);
+        assertThat(index.get("entity1")).isNotNull();
+        assertThat(index.get("entity2")).isNotNull();
+        assertThat(index.get("entity3")).isNotNull();
+
+        searchService.unindex(TestSearchEntity.class, "entity1", "entity2");
+        assertThat(index.get("entity1")).isNull();
+        assertThat(index.get("entity2")).isNull();
+        assertThat(index.get("entity3")).isNotNull();
+    }
+
+    @Test
+    public void unindexMultiple_willNotFail_whenMapIsEmpty() {
+        searchService.index(new HashMap<>()).run();
+    }
 }

@@ -83,11 +83,9 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
      * If the search service is not configured, no operation will be performed.
      *
      * @param entity The entity to remove.
-     * @return Runnable that can be used to synchronously complete the indexing operation.
      */
-    @Nonnull
-    default Runnable unIndex(E entity) {
-        return unindexByKey(getKey(entity));
+    default void unIndex(E entity) {
+        unindexByKey(getKey(entity));
     }
 
     /**
@@ -95,11 +93,9 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
      * If the search service is not configured, no operation will be performed.
      *
      * @param entities The entities to remove.
-     * @return Runnable that can be used to synchronously complete the indexing operation.
      */
-    @Nonnull
-    default Runnable unindex(Collection<E> entities) {
-        return unindexByKey(getKey(entities));
+    default void unindex(Collection<E> entities) {
+        unindexByKey(getKey(entities));
     }
 
     /**
@@ -107,12 +103,10 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
      * If the search service is not configured, no operation will be performed.
      *
      * @param entities The entities to remove.
-     * @return Runnable that can be used to synchronously complete the indexing operation.
      */
-    @Nonnull
     @SuppressWarnings("unchecked")
-    default Runnable unindex(E... entities) {
-        return unindex(Arrays.asList(entities));
+    default void unindex(E... entities) {
+        unindex(Arrays.asList(entities));
     }
 
     /**
@@ -120,11 +114,9 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
      * If the search service is not configured, no operation will be performed.
      *
      * @param key Key of the entity to remove.
-     * @return Runnable that can be used to synchronously complete the indexing operation.
      */
-    @Nonnull
-    default Runnable unindexByKey(Key<E> key) {
-        return getSearchService().unindex(getEntityType(), key.getName());
+    default void unindexByKey(Key<E> key) {
+        getSearchService().unindex(getEntityType(), key.getName());
     }
 
     /**
@@ -132,11 +124,9 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
      * If the search service is not configured, no operation will be performed.
      *
      * @param keys Keys of the entities to remove.
-     * @return Runnable that can be used to synchronously complete the indexing operation.
      */
-    @Nonnull
-    default Runnable unindexByKey(Collection<Key<E>> keys) {
-        return getSearchService().unindex(getEntityType(), keys.stream().map(Key::getName));
+    default void unindexByKey(Collection<Key<E>> keys) {
+        getSearchService().unindex(getEntityType(), keys.stream().map(Key::getName));
     }
 
     /**
@@ -144,12 +134,10 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
      * If the search service is not configured, no operation will be performed.
      *
      * @param keys Keys of the entities to remove.
-     * @return Runnable that can be used to synchronously complete the indexing operation.
      */
-    @Nonnull
     @SuppressWarnings("unchecked")
-    default Runnable unIndexByKey(Key<E>... keys) {
-        return unindexByKey(Arrays.asList(keys));
+    default void unIndexByKey(Key<E>... keys) {
+        unindexByKey(Arrays.asList(keys));
     }
 
     /*--------- AsyncRepository ---------*/
@@ -208,25 +196,15 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
     @Nonnull
     @Override
     default Runnable deleteAsync(E entity) {
-        final Runnable deleteOperation = Repository.super.deleteAsync(entity);
-        final Runnable indexOperation = unIndex(entity);
-
-        return () -> {
-            indexOperation.run();
-            deleteOperation.run();
-        };
+        unIndex(entity);
+        return Repository.super.deleteAsync(entity);
     }
 
     @Nonnull
     @Override
     default Runnable deleteAsync(Collection<E> entities) {
-        final Runnable deleteOperation = Repository.super.deleteAsync(entities);
-        final Runnable indexOperation = unindex(entities);
-
-        return () -> {
-            indexOperation.run();
-            deleteOperation.run();
-        };
+        unindex(entities);
+        return Repository.super.deleteAsync(entities);
     }
 
     @Nonnull
@@ -239,25 +217,15 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
     @Nonnull
     @Override
     default Runnable deleteByKeyAsync(Key<E> key) {
-        Runnable deleteOperation = Repository.super.deleteByKeyAsync(key);
-        Runnable indexOperation = unindexByKey(key);
-
-        return () -> {
-            indexOperation.run();
-            deleteOperation.run();
-        };
+        unindexByKey(key);
+        return Repository.super.deleteByKeyAsync(key);
     }
 
     @Nonnull
     @Override
     default Runnable deleteByKeyAsync(Collection<Key<E>> keys) {
-        Runnable deleteOperation = Repository.super.deleteByKeyAsync(keys);
-        Runnable indexOperation = unindexByKey(keys);
-
-        return () -> {
-            indexOperation.run();
-            deleteOperation.run();
-        };
+        unindexByKey(keys);
+        return Repository.super.deleteByKeyAsync(keys);
     }
 
     @Nonnull
