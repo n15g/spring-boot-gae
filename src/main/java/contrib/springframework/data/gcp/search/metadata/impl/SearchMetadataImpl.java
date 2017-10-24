@@ -41,7 +41,7 @@ public class SearchMetadataImpl implements SearchMetadata {
     }
 
     @Override
-    public Map<String, Accessor> getSearchFields(Object entity) {
+    public Map<String, Accessor> getAccessors(Object entity) {
         return accessorRegistry.get(entity.getClass());
     }
 

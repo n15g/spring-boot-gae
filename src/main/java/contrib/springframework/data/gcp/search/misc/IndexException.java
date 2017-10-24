@@ -1,7 +1,7 @@
-package contrib.springframework.data.gcp.search;
+package contrib.springframework.data.gcp.search.misc;
 
 /**
- * An exception has occurred when saving or retrieving from a search index.
+ * An exception has occurred while performing a search index operation.
  */
 public class IndexException extends RuntimeException {
 

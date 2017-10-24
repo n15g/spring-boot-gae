@@ -3,6 +3,7 @@ package contrib.springframework.data.gcp.search.conversion;
 import com.google.appengine.api.search.Document;
 import com.google.appengine.api.search.Field;
 import contrib.springframework.data.gcp.search.metadata.Accessor;
+import contrib.springframework.data.gcp.search.metadata.SearchMetadata;
 import org.springframework.core.convert.ConversionService;
 
 import java.util.List;
@@ -11,34 +12,36 @@ import java.util.function.BiFunction;
 
 /**
  * Build a search API {@link Document} from a collection of field values.
- *
- * @param <I> Document id type.
  */
-public class DocumentBuilder<I> implements BiFunction<I, Map<Accessor, Object>, Document> {
+public class DocumentBuilder implements BiFunction<Object, Object, Document> {
 
+    final SearchMetadata searchMetadata;
     final ConversionService conversionService;
     final BiFunction<Accessor, Object, List<Field>> fieldBuilder;
 
     /**
      * Create a new instance.
      *
+     * @param searchMetadata    Search metadata.
      * @param conversionService Conversion service.
      */
-    public DocumentBuilder(ConversionService conversionService) {
+    public DocumentBuilder(SearchMetadata searchMetadata, ConversionService conversionService) {
         this.conversionService = conversionService;
+        this.searchMetadata = searchMetadata;
         this.fieldBuilder = new FieldBuilder(conversionService);
     }
 
     @Override
-    public Document apply(I id, Map<Accessor, Object> fieldValues) {
+    public Document apply(Object id, Object entity) {
         String idValue = conversionService.convert(id, String.class);
 
         Document.Builder builder = createDocument(idValue);
 
-        fieldValues.forEach((accessor, value) -> {
-            List<Field> fields = fieldBuilder.apply(accessor, value);
+        Map<String, Accessor> accessors = searchMetadata.getAccessors(entity);
+        accessors.values().forEach((accessor) -> {
+            List<Field> searchFields = fieldBuilder.apply(accessor, accessor.getValue(entity));
 
-            fields.forEach(builder::addField);
+            searchFields.forEach(builder::addField);
         });
 
         return builder.build();

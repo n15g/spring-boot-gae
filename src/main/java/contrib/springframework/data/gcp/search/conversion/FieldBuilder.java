@@ -2,7 +2,7 @@ package contrib.springframework.data.gcp.search.conversion;
 
 import com.google.appengine.api.search.Field;
 import com.google.appengine.api.search.GeoPoint;
-import contrib.springframework.data.gcp.search.IndexException;
+import contrib.springframework.data.gcp.search.misc.IndexException;
 import contrib.springframework.data.gcp.search.IndexType;
 import contrib.springframework.data.gcp.search.metadata.Accessor;
 import contrib.springframework.data.gcp.search.metadata.impl.MetadataUtils;

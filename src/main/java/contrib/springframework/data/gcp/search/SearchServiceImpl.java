@@ -3,18 +3,20 @@ package contrib.springframework.data.gcp.search;
 import com.google.appengine.api.search.Document;
 import com.google.appengine.api.search.Index;
 import com.google.appengine.api.search.IndexSpec;
-import com.google.appengine.api.search.PutResponse;
 import com.google.appengine.api.search.SearchServiceFactory;
 import contrib.springframework.data.gcp.search.conversion.DocumentBuilder;
 import contrib.springframework.data.gcp.search.metadata.SearchMetadata;
+import contrib.springframework.data.gcp.search.misc.IndexOperation;
 import contrib.springframework.data.gcp.search.query.QueryBuilder;
 import org.springframework.core.convert.ConversionService;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.stream.Collectors;
+
+import static com.google.common.util.concurrent.Runnables.doNothing;
 
 /**
  * {@link SearchService} implementation.
@@ -22,7 +24,7 @@ import java.util.concurrent.Future;
 public class SearchServiceImpl implements SearchService {
 
     private final SearchMetadata searchMetadata;
-    private final ConversionService conversionService;
+    private final DocumentBuilder documentBuilder;
 
     /**
      * Create a new instance.
@@ -30,10 +32,9 @@ public class SearchServiceImpl implements SearchService {
      * @param searchMetadata    Search metadata.
      * @param conversionService Conversion service.
      */
-    public SearchServiceImpl(SearchMetadata searchMetadata,
-                             ConversionService conversionService) {
+    public SearchServiceImpl(SearchMetadata searchMetadata, ConversionService conversionService) {
         this.searchMetadata = searchMetadata;
-        this.conversionService = conversionService;
+        documentBuilder = new DocumentBuilder(searchMetadata, conversionService);
     }
 
     @Nonnull
@@ -50,10 +51,10 @@ public class SearchServiceImpl implements SearchService {
     @Nonnull
     @Override
     public <E, I> Runnable index(E entity, I id) {
-        Document document = new DocumentBuilder<I>(conversionService).apply(id, searchMetadata.getFieldValues(entity));
-        Index index = getIndex(entity);
+        Index index = getIndex(entity.getClass());
+        Document document = documentBuilder.apply(id, entity);
 
-        return resolve(
+        return new IndexOperation(
                 index.putAsync(document)
         );
     }
@@ -61,7 +62,20 @@ public class SearchServiceImpl implements SearchService {
     @Nonnull
     @Override
     public <E, I> Runnable index(Map<I, E> entities) {
-        throw new UnsupportedOperationException("Not implemented"); //TODO: Not implemented
+        if (entities.isEmpty()) {
+            return doNothing();
+        } else {
+            Class<?> entityClass = entities.values().toArray()[0].getClass();
+            Index index = getIndex(entityClass);
+
+            List<Document> documents = entities.entrySet().stream()
+                    .map(entry -> documentBuilder.apply(entry.getKey(), entry.getValue()))
+                    .collect(Collectors.toList());
+
+            return new IndexOperation(
+                    index.putAsync(documents)
+            );
+        }
     }
 
     @Nonnull
@@ -81,18 +95,8 @@ public class SearchServiceImpl implements SearchService {
         throw new UnsupportedOperationException("Not implemented");//TODO: Not implemented
     }
 
-    private <E> Index getIndex(E entity) {
+    private <E> Index getIndex(Class<E> entityClass) {
         return SearchServiceFactory.getSearchService()
-                .getIndex(IndexSpec.newBuilder().setName(searchMetadata.getIndexName(entity.getClass())));
-    }
-
-    private Runnable resolve(Future<PutResponse> putAsync) {
-        return () -> {
-            try {
-                putAsync.get();
-            } catch (InterruptedException | ExecutionException e) {
-                throw new IndexException(e);
-            }
-        };
+                .getIndex(IndexSpec.newBuilder().setName(searchMetadata.getIndexName(entityClass)));
     }
 }

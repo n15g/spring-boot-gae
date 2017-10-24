@@ -76,7 +76,11 @@ public interface SearchService {
     @Nonnull
     default <E> Runnable index(Collection<E> entities) {
         return index(
-                entities.stream().collect(Collectors.toMap(this::getId, Functions.identity()))
+                entities.stream()
+                        .collect(Collectors.toMap(
+                                this::getId,
+                                Functions.identity()
+                        ))
         );
     }
 
