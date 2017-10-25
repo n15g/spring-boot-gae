@@ -2,10 +2,10 @@ package contrib.springframework.data.gcp.search.conversion;
 
 import com.google.appengine.api.search.Field;
 import com.google.appengine.api.search.GeoPoint;
-import contrib.springframework.data.gcp.search.misc.IndexException;
 import contrib.springframework.data.gcp.search.IndexType;
 import contrib.springframework.data.gcp.search.metadata.Accessor;
 import contrib.springframework.data.gcp.search.metadata.impl.MetadataUtils;
+import contrib.springframework.data.gcp.search.misc.IndexException;
 import org.springframework.core.convert.ConversionService;
 
 import javax.annotation.Nonnull;
@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 
 import static contrib.springframework.data.gcp.search.IndexType.DATE;
 import static contrib.springframework.data.gcp.search.IndexType.NUMBER;
-import static java.util.Collections.emptyList;
 
 /**
  * Build an array of search service {@link Field}s from a field {@link Accessor}.
@@ -78,7 +77,7 @@ public class FieldBuilder implements BiFunction<Accessor, Object, List<Field>> {
     @Nonnull
     private Collection toValueList(@Nullable Object value) {
         if (value == null) {
-            return emptyList();
+            return Collections.singletonList(null);
         }
         if (value.getClass().isArray()) {
             return Arrays.asList((Object[]) value);

@@ -1,6 +1,7 @@
 package contrib.springframework.data.gcp.search;
 
 import com.google.appengine.api.search.Document;
+import com.google.appengine.api.search.GetRequest;
 import com.google.appengine.api.search.Index;
 import com.google.appengine.api.search.IndexSpec;
 import com.google.appengine.api.search.SearchServiceFactory;
@@ -93,7 +94,23 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public <E> int clear(Class<E> entityClass) {
-        throw new UnsupportedOperationException("Not implemented");//TODO: Not implemented
+        Index index = getIndex(entityClass);
+
+        GetRequest request = GetRequest.newBuilder()
+                .setReturningIdsOnly(true)
+                .setLimit(200) //Delete only allows 200 records at a time.
+                .build();
+
+        int count = 0;
+        for (List<Document> documents = getDocumentIds(index, request); !documents.isEmpty(); documents = getDocumentIds(index, request)) {
+            count += documents.size();
+            unindex(entityClass, documents.stream().map(Document::getId));
+        }
+        return count;
+    }
+
+    private List<Document> getDocumentIds(Index index, GetRequest request) {
+        return index.getRange(request).getResults();
     }
 
     private <E> Index getIndex(Class<E> entityClass) {

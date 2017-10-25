@@ -7,7 +7,11 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -95,6 +99,64 @@ public class SearchServiceImplTest extends SearchTest {
 
     @Test
     public void unindexMultiple_willNotFail_whenMapIsEmpty() {
-        searchService.index(new HashMap<>()).run();
+        searchService.unindex(TestSearchEntity.class, Collections.emptyList());
+    }
+
+    @Test
+    public void clear() {
+        List<TestSearchEntity> entityList = IntStream.range(1, 201)
+                .mapToObj(i -> new TestSearchEntity("entity" + i))
+                .collect(Collectors.toList());
+        searchService.index(entityList).run();
+
+        entityList = IntStream.range(201, 401)
+                .mapToObj(i -> new TestSearchEntity("entity" + i))
+                .collect(Collectors.toList());
+        searchService.index(entityList).run();
+
+
+        Index index = getIndex(TestSearchEntity.class);
+        assertThat(index.get("entity1")).isNotNull();
+        assertThat(index.get("entity2")).isNotNull();
+        assertThat(index.get("entity300")).isNotNull();
+
+        searchService.clear(TestSearchEntity.class);
+        assertThat(index.get("entity1")).isNull();
+        assertThat(index.get("entity2")).isNull();
+        assertThat(index.get("entity300")).isNull();
+    }
+
+    @Test
+    public void clear_willNotImpactOtherIndexes() {
+        TestSearchEntity entity1 = new TestSearchEntity("entity1");
+        OtherEntity otherEntity = new OtherEntity();
+
+        searchService.index(entity1).run();
+        searchService.index(otherEntity, "otherEntity");
+
+        Index index = getIndex(TestSearchEntity.class);
+        assertThat(index.get("entity1")).isNotNull();
+
+        Index otherIndex = getIndex(OtherEntity.class);
+        assertThat(otherIndex.get("otherEntity")).isNotNull();
+
+        searchService.clear(TestSearchEntity.class);
+        assertThat(index.get("entity1")).isNull();
+        assertThat(otherIndex.get("otherEntity")).isNotNull();
+    }
+
+    @SuppressWarnings("unused")
+    private class OtherEntity {
+        @SearchIndex
+        private String someField;
+
+        public String getSomeField() {
+            return someField;
+        }
+
+        public OtherEntity setSomeField(String someField) {
+            this.someField = someField;
+            return this;
+        }
     }
 }

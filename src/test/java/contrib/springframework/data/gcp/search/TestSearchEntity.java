@@ -25,7 +25,7 @@ public class TestSearchEntity {
     @SearchIndex
     private long longField;
     @SearchIndex
-    private GeoPoint geoPointField;
+    private GeoPoint geoPointField = new GeoPoint(0, 0);
     @SearchIndex
     private String[] stringArrayField;
     @SearchIndex
