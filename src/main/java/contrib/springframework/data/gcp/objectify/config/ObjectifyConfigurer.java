@@ -2,8 +2,8 @@ package contrib.springframework.data.gcp.objectify.config;
 
 import com.googlecode.objectify.impl.translate.TranslatorFactory;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Extending an {@link org.springframework.context.annotation.Configuration} class with ObjectifyConfigurer will allow you to customize the
@@ -17,18 +17,18 @@ public interface ObjectifyConfigurer {
      * Register translators with Objectify.
      * Translators registered here will override any matching translators registered in {@link ObjectifyAutoConfiguration}.
      *
-     * @return List of entities to register.
+     * @return Collection of entities to register.
      */
-    default List<TranslatorFactory<?, ?>> registerObjectifyTranslators() {
+    default Collection<TranslatorFactory<?, ?>> registerObjectifyTranslators() {
         return Collections.emptyList();
     }
 
     /**
      * Register entities with Objectify.
      *
-     * @return List of entities to register.
+     * @return Collection of entities to register.
      */
-    default List<Class<?>> registerObjectifyEntities() {
+    default Collection<Class<?>> registerObjectifyEntities() {
         return Collections.emptyList();
     }
 }
