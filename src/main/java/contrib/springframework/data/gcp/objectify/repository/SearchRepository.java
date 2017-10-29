@@ -32,7 +32,7 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
     SearchService getSearchService();
 
     /**
-     * Begin a search query.
+     * Begin a search filter.
      *
      * @return Query builder.
      */
@@ -50,7 +50,7 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
      */
     @Nonnull
     default Runnable index(E entity) {
-        return getSearchService().index(getKey(entity), entity);
+        return getSearchService().indexAsync(getKey(entity), entity);
     }
 
     /**
@@ -62,7 +62,7 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
      */
     @Nonnull
     default Runnable index(Collection<E> batch) {
-        return getSearchService().index(toKeyMap(batch));
+        return getSearchService().indexAsync(toKeyMap(batch));
     }
 
     /**

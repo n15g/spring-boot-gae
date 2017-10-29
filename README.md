@@ -12,6 +12,11 @@ AppEngine standard environment.
 This library has been designed to work with the new Java8 Appengine Standard Environment. It will not work
 when deployed to the Java 7 standard environment.
 
+## Limitations of the Google Search API
+
+* Collections are not supported on NUMBER or DATE fields.
+* Date/Time fields are stored and queried as DATE only, the time component is truncated.
+
 ## Getting Started
 
 ### Installing the Library

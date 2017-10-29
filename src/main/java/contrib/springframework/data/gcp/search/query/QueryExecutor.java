@@ -1,23 +1,22 @@
 package contrib.springframework.data.gcp.search.query;
 
-import com.googlecode.objectify.Result;
+import com.google.appengine.api.search.Results;
+import com.google.appengine.api.search.ScoredDocument;
 
 import javax.annotation.Nonnull;
 
 /**
  * Executes... {@link Query queries}.
- *
- * @param <E> Entity type.
  */
 @FunctionalInterface
-public interface QueryExecutor<E> {
+public interface QueryExecutor {
 
     /**
-     * Execute the given query, returning the result.
+     * Execute the given filter, returning the result.
      *
-     * @param query The query to execute.
-     * @return Result of executed query.
+     * @param query The filter to executeQuery.
+     * @return Result of executed filter.
      */
     @Nonnull
-    Result<E> execute(Query query);
+    Results<ScoredDocument> executeQuery(Query<?> query);
 }

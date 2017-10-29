@@ -1,5 +1,7 @@
 package contrib.springframework.data.gcp.search.query;
 
+import com.google.appengine.api.search.Results;
+import com.google.appengine.api.search.ScoredDocument;
 import com.googlecode.objectify.Result;
 import contrib.springframework.data.gcp.search.Operator;
 import contrib.springframework.data.gcp.search.SearchService;
@@ -11,28 +13,28 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Encapsulates the construction of a query to be performed using the {@link SearchService}.
+ * Encapsulates the construction of a filter to be performed using the {@link SearchService}.
  *
  * @param <E> Entity type.
  */
 public interface QueryBuilder<E> {
 
     /**
-     * Append a raw query string to the filter.
+     * Filter by records containing the given value across any field.
      *
-     * @param query The value to search for.
-     * @return The query under construction.
+     * @param value The value to search for.
+     * @return Query builder.
      */
     @Nonnull
-    QueryBuilder<E> query(CharSequence query);
+    QueryBuilder<E> filter(@Nullable Object value);
 
     /**
      * Filter records.
      *
      * @param field    The field to search.
      * @param operator The operator to apply filtering with.
-     * @param value    The value to filter by.
-     * @return The query under construction.
+     * @param value    The value to filterIn by.
+     * @return Query builder.
      */
     @Nonnull
     QueryBuilder<E> filter(String field, Operator operator, @Nullable Object value);
@@ -40,24 +42,24 @@ public interface QueryBuilder<E> {
     /**
      * Filter records matching one of the given values.
      *
-     * @param field  The field to filter.
+     * @param field  The field to filterIn.
      * @param values Collection of values to test against.
-     * @return The query under construction.
+     * @return Query builder.
      */
     @Nonnull
-    default QueryBuilder<E> filter(String field, Collection<?> values) {
+    default QueryBuilder<E> filterIn(String field, Collection<?> values) {
         return filter(field, Operator.IN, values);
     }
 
     /**
      * Filter records matching one of the given values.
      *
-     * @param field  The field to filter.
+     * @param field  The field to filterIn.
      * @param values Collection of values to test against.
-     * @return The query under construction.
+     * @return Query builder.
      */
     @Nonnull
-    default QueryBuilder<E> filter(String field, Object... values) {
+    default QueryBuilder<E> filterIn(String field, Object... values) {
         return filter(field, Operator.IN, Arrays.asList(values));
     }
 
@@ -65,7 +67,7 @@ public interface QueryBuilder<E> {
      * Limits the number of results returned.
      *
      * @param limit Maximum number of records to return.
-     * @return The query under construction.
+     * @return Query builder.
      */
     @Nonnull
     QueryBuilder<E> limit(int limit);
@@ -75,7 +77,7 @@ public interface QueryBuilder<E> {
      * Use alongside {@link #limit(int)} to page results.
      *
      * @param offset The number or records to skip.
-     * @return The query under construction.
+     * @return Query builder.
      */
     @Nonnull
     QueryBuilder<E> skip(int offset);
@@ -86,7 +88,7 @@ public interface QueryBuilder<E> {
      * an estimate based on samples. A high number has performance implications.
      *
      * @param accuracy The desired accuracy of the response.
-     * @return The query under construction.
+     * @return Query builder.
      */
     @Nonnull
     QueryBuilder<E> accuracy(int accuracy);
@@ -96,7 +98,7 @@ public interface QueryBuilder<E> {
      * The sequence in which multiple orders are specified will determine the final {@link Sort} order.
      *
      * @param field The field to order by.
-     * @return The query under construction.
+     * @return Query builder.
      */
     @Nonnull
     default QueryBuilder<E> order(String field) {
@@ -109,13 +111,32 @@ public interface QueryBuilder<E> {
      *
      * @param field     The field to order by.
      * @param direction The direction to order by.
-     * @return The query under construction.
+     * @return Query builder.
      */
     @Nonnull
     QueryBuilder<E> order(String field, Sort.Direction direction);
 
     /**
-     * Builds the query and returns the result.
+     * Set whether the filter will retrieve ids only.
+     *
+     * @param onlyIds Retrieve ids only?
+     * @return Query builder.
+     */
+    @Nonnull
+    QueryBuilder<E> setRetrieveIdsOnly(boolean onlyIds);
+
+    /**
+     * Set the filter to retrieve ids only.
+     *
+     * @return Query builder.
+     */
+    @Nonnull
+    default QueryBuilder<E> retrieveIdsOnly() {
+        return setRetrieveIdsOnly(true);
+    }
+
+    /**
+     * Builds the filter and returns the result.
      *
      * @return The compiled {@link Query} object.
      */
@@ -123,10 +144,10 @@ public interface QueryBuilder<E> {
     Query<E> build();
 
     /**
-     * Execute the query and return the {@link Result}.
+     * Execute the filter and return the {@link Result}.
      *
      * @return Search result.
      */
     @Nonnull
-    Result<E> execute();
+    Results<ScoredDocument> execute();
 }

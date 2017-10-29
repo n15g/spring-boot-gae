@@ -1,6 +1,7 @@
 package contrib.springframework.data.gcp.search.query;
 
-import com.googlecode.objectify.Result;
+import com.google.appengine.api.search.Results;
+import com.google.appengine.api.search.ScoredDocument;
 import contrib.springframework.data.gcp.search.Operator;
 import org.springframework.data.domain.Sort;
 
@@ -18,20 +19,21 @@ import java.util.Optional;
 public class QueryImpl<E> implements QueryBuilder<E>, Query<E> {
 
     private final Class<E> resultType;
-    private final QueryExecutor<E> queryExecutor;
+    private final QueryExecutor queryExecutor;
     private final List<Query.Fragment> fragments = new ArrayList<>();
     private Sort sort = null;
     private Integer limit = null;
     private Integer skip = null;
     private Integer accuracy = null;
+    private boolean idsOnly = false;
 
     /**
      * Create a new instance.
      *
-     * @param resultType    The type of result this query produces.
-     * @param queryExecutor The executor to use to execute this query.
+     * @param resultType    The type of result this filter produces.
+     * @param queryExecutor The executor to use to executeQuery this filter.
      */
-    public QueryImpl(Class<E> resultType, QueryExecutor<E> queryExecutor) {
+    public QueryImpl(Class<E> resultType, QueryExecutor queryExecutor) {
         this.resultType = resultType;
         this.queryExecutor = queryExecutor;
     }
@@ -44,9 +46,9 @@ public class QueryImpl<E> implements QueryBuilder<E>, Query<E> {
 
     @Nonnull
     @Override
-    public QueryBuilder<E> query(CharSequence query) {
+    public QueryBuilder<E> filter(@Nullable Object value) {
         fragments.add(
-                new RawQueryFragment(query.toString())
+                new ValueFragment(value)
         );
         return this;
     }
@@ -92,14 +94,21 @@ public class QueryImpl<E> implements QueryBuilder<E>, Query<E> {
 
     @Nonnull
     @Override
+    public QueryBuilder<E> setRetrieveIdsOnly(boolean idsOnly) {
+        this.idsOnly = idsOnly;
+        return this;
+    }
+
+    @Nonnull
+    @Override
     public Query<E> build() {
         return this;
     }
 
     @Nonnull
     @Override
-    public Result<E> execute() {
-        return queryExecutor.execute(this);
+    public Results<ScoredDocument> execute() {
+        return queryExecutor.executeQuery(this);
     }
 
     @Nonnull
@@ -130,6 +139,11 @@ public class QueryImpl<E> implements QueryBuilder<E>, Query<E> {
     @Override
     public Optional<Sort> getSort() {
         return Optional.ofNullable(sort);
+    }
+
+    @Override
+    public boolean isIdsOnly() {
+        return idsOnly;
     }
 
 }

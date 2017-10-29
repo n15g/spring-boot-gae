@@ -9,20 +9,20 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Provides an interface to the components of a search query.
+ * Provides an interface to the components of a search filter.
  *
  * @param <E> Result type.
  */
 public interface Query<E> {
 
     /**
-     * @return The type of result this query produces.
+     * @return The type of result this filter produces.
      */
     @Nonnull
     Class<E> getResultType();
 
     /**
-     * @return The list of query fragments.
+     * @return The list of filter fragments.
      */
     @Nonnull
     List<Fragment> getFragments();
@@ -53,11 +53,16 @@ public interface Query<E> {
     Optional<Sort> getSort();
 
     /**
-     * A query filter fragment.
+     * @return Whether the filter will return only document ids.
+     */
+    boolean isIdsOnly();
+
+    /**
+     * A filter filterIn fragment.
      */
     interface Fragment {
         /**
-         * @return Is this a raw query fragment string without field or operator?
+         * @return Is this a raw filter fragment string without field or operator?
          */
         boolean isRaw();
 
@@ -68,14 +73,14 @@ public interface Query<E> {
         String getField();
 
         /**
-         * @return The operator used in the filter.
+         * @return The operator used in the filterIn.
          * @see Operator
          */
         @Nonnull
         Operator getOperator();
 
         /**
-         * @return The value of the filter. If a {@link #isRaw() raw} fragment, the query fragment itself.
+         * @return The value of the filterIn. If a {@link #isRaw() raw} fragment, the filter fragment itself.
          */
         @Nullable
         Object getValue();

@@ -124,8 +124,8 @@ public interface Repository<E, I extends Serializable> extends AsyncRepository<E
      * Note that the given field must be indexed for anything to be returned.
      * This will load all entities into memory, so should only be used where the number of entities is constrained.
      *
-     * @param field Name of the field to filter by.
-     * @param value The value to filter by.
+     * @param field Name of the field to filterIn by.
+     * @param value The value to filterIn by.
      * @return List of entities matching the given value.
      */
     @Nonnull
@@ -142,8 +142,8 @@ public interface Repository<E, I extends Serializable> extends AsyncRepository<E
      * Note that the given field must be indexed for anything to be returned.
      * This will load all entities into memory, so should only be used where the number of entities is constrained.
      *
-     * @param field  Name of the field to filter by.
-     * @param values List of values to filter by.
+     * @param field  Name of the field to filterIn by.
+     * @param values List of values to filterIn by.
      * @return List of entities matching the given values.
      */
     @Nonnull
@@ -160,8 +160,8 @@ public interface Repository<E, I extends Serializable> extends AsyncRepository<E
      * Note that the given field must be indexed for anything to be returned.
      * This will load all entities into memory, so should only be used where the number of entities is constrained.
      *
-     * @param field  Name of the field to filter by.
-     * @param values List of values to filter by.
+     * @param field  Name of the field to filterIn by.
+     * @param values List of values to filterIn by.
      * @return List of entities matching the given values.
      */
     @Nonnull

@@ -46,7 +46,7 @@ public @interface EnableObjectifyRepositories {
 
     /**
      * @return Which types are eligible for component scanning. Further narrows the set of candidate components from
-     * everything in {@link #basePackages()} to everything in the base packages that matches the given filter or filters.
+     * everything in {@link #basePackages()} to everything in the base packages that matches the given filterIn or filters.
      */
     Filter[] includeFilters() default {};
 
@@ -70,7 +70,7 @@ public @interface EnableObjectifyRepositories {
     String namedQueriesLocation() default "";
 
     /**
-     * @return The key of the {@link org.springframework.data.repository.query.QueryLookupStrategy} to be used for lookup queries for query methods. Defaults to
+     * @return The key of the {@link org.springframework.data.repository.query.QueryLookupStrategy} to be used for lookup queries for filter methods. Defaults to
      * {@link Key#CREATE_IF_NOT_FOUND}.
      */
     Key queryLookupStrategy() default Key.CREATE_IF_NOT_FOUND;

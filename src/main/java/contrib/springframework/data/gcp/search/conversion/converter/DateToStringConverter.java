@@ -10,8 +10,12 @@ import java.util.Date;
  * Convert {@link Date} values to ISO-8601 format {@link String} values.
  */
 public class DateToStringConverter implements Converter<Date, String> {
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd")
+            .withZone(ZoneOffset.UTC);
+
     @Override
     public String convert(Date source) {
-        return DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC).format(source.toInstant());
+        return FORMATTER.format(source.toInstant());
     }
 }

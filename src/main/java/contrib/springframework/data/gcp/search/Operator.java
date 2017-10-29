@@ -64,13 +64,15 @@ public enum Operator {
     IN("in"),
 
     /**
-     * Does any part of {@literal A} match the fragment {@literal B}?
-     * Used for inexact/fuzzy searching, etc.
+     * To search for common variations of a word, like plural forms and verb endings, use the ~ stem operator (the tilde character).
+     * This is a prefix operator which must precede a value with no intervening space. The value ~cat will match "cat" or "cats,"
+     * and likewise ~dog matches "dog" or "dogs." The stemming algorithm is not fool-proof. The value ~care will match "care" and
+     * "caring," but not "cares" or "cared." Stemming is only used when searching text and HTML fields.
+     * https://cloud.google.com/appengine/docs/standard/java/search/query_strings
      */
-    LIKE(":~"),
+    STEM("=~"),
 
-    IS(":"),
-    NEAR("near");
+    IS(":");
 
     private String symbol;
 

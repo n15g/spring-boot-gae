@@ -2,7 +2,7 @@ package contrib.springframework.data.gcp.search.conversion;
 
 import com.google.appengine.api.search.Document;
 import com.google.appengine.api.search.Field;
-import contrib.springframework.data.gcp.search.metadata.Accessor;
+import contrib.springframework.data.gcp.search.metadata.SearchFieldMetadata;
 import contrib.springframework.data.gcp.search.metadata.SearchMetadata;
 import org.springframework.core.convert.ConversionService;
 
@@ -17,7 +17,7 @@ public class DocumentBuilder implements BiFunction<Object, Object, Document> {
 
     final SearchMetadata searchMetadata;
     final ConversionService conversionService;
-    final BiFunction<Accessor, Object, List<Field>> fieldBuilder;
+    final BiFunction<SearchFieldMetadata, Object, List<Field>> fieldBuilder;
 
     /**
      * Create a new instance.
@@ -37,7 +37,7 @@ public class DocumentBuilder implements BiFunction<Object, Object, Document> {
 
         Document.Builder builder = createDocument(idValue);
 
-        Map<String, Accessor> accessors = searchMetadata.getAccessors(entity);
+        Map<String, SearchFieldMetadata> accessors = searchMetadata.getFields(entity.getClass());
         accessors.values().forEach((accessor) -> {
             List<Field> searchFields = fieldBuilder.apply(accessor, accessor.getValue(entity));
 

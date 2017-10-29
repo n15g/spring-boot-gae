@@ -1,8 +1,8 @@
 package contrib.springframework.data.gcp.search.metadata.impl;
 
 import contrib.springframework.data.gcp.search.SearchId;
-import contrib.springframework.data.gcp.search.metadata.IndexTypeRegistry;
 import contrib.springframework.data.gcp.search.SearchIndex;
+import contrib.springframework.data.gcp.search.metadata.IndexTypeRegistry;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,7 +13,7 @@ import org.mockito.junit.MockitoRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AccessorRegistryTest {
+public class SearchFieldMetadataRegistryTest {
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -23,11 +23,11 @@ public class AccessorRegistryTest {
     @Mock
     private IndexTypeRegistry indexTypeRegistry;
 
-    private AccessorRegistry registry;
+    private SearchFieldMetadataRegistry registry;
 
     @Before
     public void setUp() throws Exception {
-        registry = new AccessorRegistryImpl(indexTypeRegistry);
+        registry = new SearchFieldMetadataRegistryImpl(indexTypeRegistry);
     }
 
     @Test
@@ -155,33 +155,33 @@ public class AccessorRegistryTest {
     }
 
     @Test
-    public void getIdAccessor() throws Exception {
+    public void getIdField() throws Exception {
         registry.register(TestEntity.class);
-        assertThat(registry.getIdAccessor(TestEntity.class).getMemberName()).isEqualTo("id");
+        assertThat(registry.getIdField(TestEntity.class).getMemberName()).isEqualTo("id");
     }
 
     @Test
-    public void getIdAccessor_willRegisterAutomatically_whenClassIsUnregistered() throws Exception {
-        assertThat(registry.getIdAccessor(TestEntity.class).getMemberName()).isEqualTo("id");
+    public void getIdField_willRegisterAutomatically_whenClassIsUnregistered() throws Exception {
+        assertThat(registry.getIdField(TestEntity.class).getMemberName()).isEqualTo("id");
     }
 
     @Test
-    public void getIdAccessor_willThrowException_whenThereIsNoId() throws Exception {
+    public void getIdField_willThrowException_whenThereIsNoId() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("No @SearchId on entity class: " + TestNonEntity.class);
-        assertThat(registry.getIdAccessor(TestNonEntity.class));
+        assertThat(registry.getIdField(TestNonEntity.class));
     }
 
     @Test
-    public void getIdAccessor_willWork_whenIdIsAMethod() throws Exception {
-        assertThat(registry.getIdAccessor(TestIdMethodEntity.class).getMemberName()).isEqualTo("id");
+    public void getIdField_willWork_whenIdIsAMethod() throws Exception {
+        assertThat(registry.getIdField(TestIdMethodEntity.class).getMemberName()).isEqualTo("id");
     }
 
     @Test
-    public void getIdAccessor_willFailGracefully_whenNotAnEntity() {
+    public void getIdField_willFailGracefully_whenNotAnEntity() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("No @SearchId on entity class: " + String.class);
-        registry.getIdAccessor(String.class);
+        registry.getIdField(String.class);
     }
 
     @SuppressWarnings("unused")

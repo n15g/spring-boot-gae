@@ -25,25 +25,25 @@ public class NoOpSearchService implements SearchService {
 
     @Nonnull
     @Override
-    public <E> Runnable index(E entity) {
+    public <E> Runnable indexAsync(E entity) {
         return doNothing();
     }
 
     @Nonnull
     @Override
-    public <E> Runnable index(E entity, String id) {
+    public <E> Runnable indexAsync(E entity, String id) {
         return doNothing();
     }
 
     @Nonnull
     @Override
-    public <E> Runnable index(Collection<E> entities) {
+    public <E> Runnable indexAsync(Collection<E> entities) {
         return doNothing();
     }
 
     @Nonnull
     @Override
-    public <E> Runnable index(Map<String, E> entities) {
+    public <E> Runnable indexAsync(Map<String, E> entities) {
         return doNothing();
     }
 

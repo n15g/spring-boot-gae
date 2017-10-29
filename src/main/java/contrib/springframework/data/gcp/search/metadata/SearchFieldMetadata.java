@@ -9,19 +9,19 @@ import java.lang.reflect.Type;
 /**
  * Provides access to a search field or method on an entity class.
  */
-public interface Accessor {
+public interface SearchFieldMetadata {
     /**
      * @return The entity type this accessor belongs to.
      */
     Class<?> getEntityType();
 
     /**
-     * @return The member being accessed.
+     * @return The java {@link Member} for this search field.
      */
     Member getMember();
 
     /**
-     * @return The
+     * @return The name of the java {@link Member} for this search field.
      */
     default String getMemberName() {
         return getMember().getName();

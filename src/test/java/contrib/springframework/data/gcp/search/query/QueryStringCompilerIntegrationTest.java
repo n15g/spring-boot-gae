@@ -16,7 +16,7 @@ import org.springframework.core.convert.ConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
-public class QueryCompilerIntegrationTest extends ObjectifyTest {
+public class QueryStringCompilerIntegrationTest extends ObjectifyTest {
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -25,11 +25,11 @@ public class QueryCompilerIntegrationTest extends ObjectifyTest {
 
     private ConversionService conversionService = new DefaultSearchConversionService();
 
-    private QueryCompiler<TestSearchEntity> compiler;
+    private QueryStringCompiler compiler;
 
     @Before
     public void setUp() throws Exception {
-        compiler = new QueryCompiler<>(TestSearchEntity.class, searchMetadata, conversionService);
+        compiler = new QueryStringCompiler(searchMetadata, conversionService);
     }
 
     @Test
@@ -37,8 +37,8 @@ public class QueryCompilerIntegrationTest extends ObjectifyTest {
         Query<TestSearchEntity> query = query()
                 .filter("stringField", Operator.EQUAL, "stringValue")
                 .filter("longField", Operator.GREATER_THAN, 3)
-                .filter("id", "id1", "id2")
-                .filter("stringArrayField", Operator.LIKE, "likeValue")
+                .filterIn("id", "id1", "id2")
+                .filter("stringArrayField", Operator.STEM, "likeValue")
                 .order("stringField", DESC)
                 .skip(1)
                 .accuracy(2)
@@ -46,7 +46,7 @@ public class QueryCompilerIntegrationTest extends ObjectifyTest {
                 .build();
 
         assertThat(compiler.apply(query))
-                .isEqualTo("stringField=\"stringValue\" longField>\"3\" id:(\"id1\" OR \"id2\") stringArrayField:~\"likeValue\"");
+                .isEqualTo("stringField=\"stringValue\" longField>\"3\" id:(\"id1\" OR \"id2\") stringArrayField=~\"likeValue\"");
     }
 
     private QueryImpl<TestSearchEntity> query() {

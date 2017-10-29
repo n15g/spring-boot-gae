@@ -54,7 +54,7 @@ public class TestSearchEntity {
         return stringField;
     }
 
-    public TestSearchEntity setStringField(String stringField) {
+    public TestSearchEntity setStringField(@Nullable String stringField) {
         this.stringField = stringField;
         return this;
     }
@@ -81,7 +81,7 @@ public class TestSearchEntity {
         return stringArrayField;
     }
 
-    public TestSearchEntity setStringArrayField(String[] stringArrayField) {
+    public TestSearchEntity setStringArrayField(@Nullable String[] stringArrayField) {
         this.stringArrayField = stringArrayField;
         return this;
     }
@@ -90,7 +90,7 @@ public class TestSearchEntity {
         return stringListField;
     }
 
-    public TestSearchEntity setStringListField(List<String> stringListField) {
+    public TestSearchEntity setStringListField(@Nullable List<String> stringListField) {
         this.stringListField = stringListField;
         return this;
     }

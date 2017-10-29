@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -30,7 +31,7 @@ public class SearchServiceImplTest extends SearchTest {
                 .setGeoPointField(new GeoPoint(1, 2))
                 .setUnindexedValue("unindexed");
 
-        searchService.index(entity).run();
+        searchService.index(entity);
 
         Index index = getIndex(TestSearchEntity.class);
         Document result = index.get("id1");
@@ -43,6 +44,14 @@ public class SearchServiceImplTest extends SearchTest {
     }
 
     @Test
+    public void index_willDoNothing_whenEntityHasNoSearchFields() {
+        searchService.index(new EmptyEntity(), "some-id");
+
+        Index index = getIndex(EmptyEntity.class);
+        assertThat(index.get("some-id")).isNull();
+    }
+
+    @Test
     public void indexMultiple() {
         TestSearchEntity entity1 = new TestSearchEntity("entity1").setStringField("value1");
         TestSearchEntity entity2 = new TestSearchEntity("entity2").setStringField("value2");
@@ -50,7 +59,7 @@ public class SearchServiceImplTest extends SearchTest {
 
         searchService.index(Arrays.asList(
                 entity1, entity2, entity3
-        )).run();
+        ));
 
         Index index = getIndex(TestSearchEntity.class);
         assertThat(index.get("entity1").getFields("stringField")).extracting("text").containsExactly("value1");
@@ -59,15 +68,30 @@ public class SearchServiceImplTest extends SearchTest {
     }
 
     @Test
+    public void indexMultiple_willDoNothing_whenEntityHasNoSearchFields() {
+        Map<String, EmptyEntity> entities = new HashMap<>();
+        entities.put("id1", new EmptyEntity());
+        entities.put("id2", new EmptyEntity());
+        entities.put("id3", new EmptyEntity());
+
+        searchService.index(entities);
+
+        Index index = getIndex(EmptyEntity.class);
+        assertThat(index.get("id1")).isNull();
+        assertThat(index.get("id2")).isNull();
+        assertThat(index.get("id3")).isNull();
+    }
+
+    @Test
     public void indexMultiple_willNotFail_whenMapIsEmpty() {
-        searchService.index(new HashMap<>()).run();
+        searchService.index(new HashMap<>());
     }
 
     @Test
     public void unindex() {
         Index index = getIndex(TestSearchEntity.class);
 
-        searchService.index(new TestSearchEntity("entity1"), new TestSearchEntity("entity2")).run();
+        searchService.index(new TestSearchEntity("entity1"), new TestSearchEntity("entity2"));
         assertThat(index.get("entity1")).isNotNull();
         assertThat(index.get("entity2")).isNotNull();
 
@@ -84,7 +108,7 @@ public class SearchServiceImplTest extends SearchTest {
 
         searchService.index(Arrays.asList(
                 entity1, entity2, entity3
-        )).run();
+        ));
 
         Index index = getIndex(TestSearchEntity.class);
         assertThat(index.get("entity1")).isNotNull();
@@ -107,12 +131,12 @@ public class SearchServiceImplTest extends SearchTest {
         List<TestSearchEntity> entityList = IntStream.range(1, 201)
                 .mapToObj(i -> new TestSearchEntity("entity" + i))
                 .collect(Collectors.toList());
-        searchService.index(entityList).run();
+        searchService.index(entityList);
 
         entityList = IntStream.range(201, 401)
                 .mapToObj(i -> new TestSearchEntity("entity" + i))
                 .collect(Collectors.toList());
-        searchService.index(entityList).run();
+        searchService.index(entityList);
 
 
         Index index = getIndex(TestSearchEntity.class);
@@ -131,7 +155,7 @@ public class SearchServiceImplTest extends SearchTest {
         TestSearchEntity entity1 = new TestSearchEntity("entity1");
         OtherEntity otherEntity = new OtherEntity();
 
-        searchService.index(entity1).run();
+        searchService.index(entity1);
         searchService.index(otherEntity, "otherEntity");
 
         Index index = getIndex(TestSearchEntity.class);
@@ -158,5 +182,9 @@ public class SearchServiceImplTest extends SearchTest {
             this.someField = someField;
             return this;
         }
+    }
+
+    private class EmptyEntity {
+
     }
 }

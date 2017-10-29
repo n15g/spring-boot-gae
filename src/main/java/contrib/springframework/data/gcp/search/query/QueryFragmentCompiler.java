@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * Compiles a query fragment into a query string.
+ * Compiles a filter fragment into a filter string.
  */
 class QueryFragmentCompiler implements Function<Query.Fragment, String> {
     private final Class<?> entityType;

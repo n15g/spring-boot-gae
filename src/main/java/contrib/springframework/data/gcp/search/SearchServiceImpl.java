@@ -4,11 +4,18 @@ import com.google.appengine.api.search.Document;
 import com.google.appengine.api.search.GetRequest;
 import com.google.appengine.api.search.Index;
 import com.google.appengine.api.search.IndexSpec;
+import com.google.appengine.api.search.Results;
+import com.google.appengine.api.search.ScoredDocument;
 import com.google.appengine.api.search.SearchServiceFactory;
+import com.google.common.util.concurrent.Runnables;
 import contrib.springframework.data.gcp.search.conversion.DocumentBuilder;
 import contrib.springframework.data.gcp.search.metadata.SearchMetadata;
 import contrib.springframework.data.gcp.search.misc.IndexOperation;
+import contrib.springframework.data.gcp.search.query.Query;
 import contrib.springframework.data.gcp.search.query.QueryBuilder;
+import contrib.springframework.data.gcp.search.query.QueryCompiler;
+import contrib.springframework.data.gcp.search.query.QueryExecutor;
+import contrib.springframework.data.gcp.search.query.QueryImpl;
 import org.springframework.core.convert.ConversionService;
 
 import javax.annotation.Nonnull;
@@ -22,11 +29,12 @@ import static com.google.common.util.concurrent.Runnables.doNothing;
 /**
  * {@link SearchService} implementation.
  */
-public class SearchServiceImpl implements SearchService {
+public class SearchServiceImpl implements SearchService, QueryExecutor {
 
     private final SearchMetadata searchMetadata;
     private final DocumentBuilder documentBuilder;
     private final ConversionService conversionService;
+    private QueryCompiler queryCompiler;
 
     /**
      * Create a new instance.
@@ -37,13 +45,14 @@ public class SearchServiceImpl implements SearchService {
     public SearchServiceImpl(SearchMetadata searchMetadata, ConversionService conversionService) {
         this.searchMetadata = searchMetadata;
         this.conversionService = conversionService;
-        documentBuilder = new DocumentBuilder(searchMetadata, this.conversionService);
+        documentBuilder = new DocumentBuilder(searchMetadata, conversionService);
+        queryCompiler = new QueryCompiler(searchMetadata, conversionService);
     }
 
     @Nonnull
     @Override
     public <E> QueryBuilder<E> search(Class<E> entityClass) {
-        throw new UnsupportedOperationException("Not implemented");//TODO: Not implemented
+        return new QueryImpl<>(entityClass, this);
     }
 
     @Override
@@ -53,7 +62,11 @@ public class SearchServiceImpl implements SearchService {
 
     @Nonnull
     @Override
-    public <E> Runnable index(E entity, String id) {
+    public <E> Runnable indexAsync(E entity, String id) {
+        if (!searchMetadata.hasIndexedFields(entity.getClass())) {
+            return Runnables.doNothing();
+        }
+
         Index index = getIndex(entity.getClass());
         Document document = documentBuilder.apply(id, entity);
 
@@ -64,21 +77,24 @@ public class SearchServiceImpl implements SearchService {
 
     @Nonnull
     @Override
-    public <E> Runnable index(Map<String, E> entities) {
+    public <E> Runnable indexAsync(Map<String, E> entities) {
         if (entities.isEmpty()) {
             return doNothing();
-        } else {
-            Class<?> entityClass = entities.values().toArray()[0].getClass();
-            Index index = getIndex(entityClass);
-
-            List<Document> documents = entities.entrySet().stream()
-                    .map(entry -> documentBuilder.apply(entry.getKey(), entry.getValue()))
-                    .collect(Collectors.toList());
-
-            return new IndexOperation(
-                    index.putAsync(documents)
-            );
         }
+
+        Class<?> entityClass = entities.values().toArray()[0].getClass();
+        if (!searchMetadata.hasIndexedFields(entityClass)) {
+            return doNothing();
+        }
+
+        List<Document> documents = entities.entrySet().stream()
+                .map(entry -> documentBuilder.apply(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+
+        Index index = getIndex(entityClass);
+        return new IndexOperation(
+                index.putAsync(documents)
+        );
     }
 
     @Override
@@ -107,6 +123,13 @@ public class SearchServiceImpl implements SearchService {
             unindex(entityClass, documents.stream().map(Document::getId));
         }
         return count;
+    }
+
+    @Nonnull
+    @Override
+    public Results<ScoredDocument> executeQuery(Query<?> query) {
+        return getIndex(query.getResultType())
+                .search(queryCompiler.apply(query));
     }
 
     private List<Document> getDocumentIds(Index index, GetRequest request) {

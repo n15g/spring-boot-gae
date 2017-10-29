@@ -31,12 +31,21 @@ public interface SearchMetadata {
     <E> String getIndexName(Class<E> entityClass);
 
     /**
-     * Return a map of indexed field values for the given entity.
+     * Return a map of member accessors for the given entity, keyed by member name.
      *
-     * @param entity The entity.
-     * @return Map of field values.
+     * @param entityClass The entity class.
+     * @return Map of member accessors.
      */
-    Map<String, Accessor> getAccessors(Object entity);
+    Map<String, SearchFieldMetadata> getFields(Class<?> entityClass);
+
+    /**
+     * Retrieve the field accessor for the member with the given name.
+     *
+     * @param entityClass The entity class.
+     * @param memberName  The field/method name.
+     * @return Member accessor.
+     */
+    SearchFieldMetadata getField(Class<?> entityClass, String memberName);
 
     /**
      * Encode the name of a field for use in a search index.

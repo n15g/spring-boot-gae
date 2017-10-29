@@ -71,7 +71,7 @@ public class SearchMetadataImplTest {
                 .setGeoPointField(new GeoPoint(1.1, 2.2))
                 .setUnindexedValue("unindexedValue");
 
-        Map<String, Accessor> result = searchMetadata.getAccessors(entity);
+        Map<String, SearchFieldMetadata> result = searchMetadata.getFields(entity.getClass());
         assertThat(result.get("stringField").getValue(entity)).isEqualTo("stringValue");
         assertThat(result.get("stringField").getValue(entity)).isEqualTo("stringValue");
         assertThat(result.get("longField").getValue(entity)).isEqualTo(1234567890L);

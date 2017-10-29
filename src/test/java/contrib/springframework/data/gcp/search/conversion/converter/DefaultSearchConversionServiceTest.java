@@ -212,7 +212,7 @@ public class DefaultSearchConversionServiceTest {
 
     @Test
     public void convert_willHandleDateValues() {
-        assertThat(convert(new Date(1234567890L))).isEqualTo("1970-01-15T06:56:07.89Z");
+        assertThat(convert(new Date(1234567890L))).isEqualTo("1970-01-15");
     }
 
     @Test
@@ -220,26 +220,26 @@ public class DefaultSearchConversionServiceTest {
         assertThat(convertCollection(
                 Arrays.asList(new Date(1234567890L), new Date(9876543210L))
         )).isEqualTo(
-                Arrays.asList("1970-01-15T06:56:07.89Z", "1970-04-25T07:29:03.21Z")
+                Arrays.asList("1970-01-15", "1970-04-25")
         );
 
         assertThat(convertCollection(
                 new Date[]{new Date(1234567890L), new Date(9876543210L)}
         )).isEqualTo(
-                Arrays.asList("1970-01-15T06:56:07.89Z", "1970-04-25T07:29:03.21Z")
+                Arrays.asList("1970-01-15", "1970-04-25")
         );
     }
 
     @Test
     public void convert_willHandleOffsetDateTimeValues() {
         OffsetDateTime time = OffsetDateTime.of(2017, 10, 11, 17, 24, 36, 123456789, ZoneOffset.UTC);
-        assertThat(convert(time)).isEqualTo("2017-10-11T17:24:36.123456789Z");
+        assertThat(convert(time)).isEqualTo("2017-10-11");
     }
 
     @Test
     public void convert_willHandleOffsetDateTimeValues_whenValueHasOffset() {
         OffsetDateTime timeWithOffset = OffsetDateTime.of(2017, 10, 11, 17, 24, 36, 123456789, ZoneOffset.ofHours(10));
-        assertThat(convert(timeWithOffset)).isEqualTo("2017-10-11T17:24:36.123456789+10:00");
+        assertThat(convert(timeWithOffset)).isEqualTo("2017-10-11");
     }
 
     @Test
@@ -250,13 +250,13 @@ public class DefaultSearchConversionServiceTest {
         assertThat(convertCollection(
                 Arrays.asList(time1, time2)
         )).isEqualTo(
-                Arrays.asList("2017-10-11T17:24:36.123456789Z", "2017-10-15T16:28:40.123456789Z")
+                Arrays.asList("2017-10-11", "2017-10-15")
         );
 
         assertThat(convertCollection(
                 new OffsetDateTime[]{time1, time2}
         )).isEqualTo(
-                Arrays.asList("2017-10-11T17:24:36.123456789Z", "2017-10-15T16:28:40.123456789Z")
+                Arrays.asList("2017-10-11", "2017-10-15")
         );
     }
 
@@ -268,26 +268,26 @@ public class DefaultSearchConversionServiceTest {
         assertThat(convertCollection(
                 Arrays.asList(time1, time2)
         )).isEqualTo(
-                Arrays.asList("2017-10-11T17:24:36.123456789+10:00", "2017-10-15T16:28:40.123456789+10:00")
+                Arrays.asList("2017-10-11", "2017-10-15")
         );
 
         assertThat(convertCollection(
                 new OffsetDateTime[]{time1, time2}
         )).isEqualTo(
-                Arrays.asList("2017-10-11T17:24:36.123456789+10:00", "2017-10-15T16:28:40.123456789+10:00")
+                Arrays.asList("2017-10-11", "2017-10-15")
         );
     }
 
     @Test
     public void convert_willHandleZonedDateTimeValues() {
         ZonedDateTime time = ZonedDateTime.of(2017, 10, 11, 17, 24, 36, 123456789, ZoneOffset.UTC);
-        assertThat(convert(time)).isEqualTo("2017-10-11T17:24:36.123456789Z");
+        assertThat(convert(time)).isEqualTo("2017-10-11");
     }
 
     @Test
     public void convert_willHandleZonedDateTimeValues_whenValueHasTimeZone() {
         ZonedDateTime timeWithZone = ZonedDateTime.of(2017, 10, 11, 17, 24, 36, 123456789, ZoneId.of("Australia/Sydney"));
-        assertThat(convert(timeWithZone)).isEqualTo("2017-10-11T17:24:36.123456789+11:00[Australia/Sydney]");
+        assertThat(convert(timeWithZone)).isEqualTo("2017-10-11");
     }
 
     @Test
@@ -298,13 +298,13 @@ public class DefaultSearchConversionServiceTest {
         assertThat(convertCollection(
                 Arrays.asList(time1, time2)
         )).isEqualTo(
-                Arrays.asList("2017-10-11T17:24:36.123456789Z", "2017-10-15T16:28:40.123456789Z")
+                Arrays.asList("2017-10-11", "2017-10-15")
         );
 
         assertThat(convertCollection(
                 new ZonedDateTime[]{time1, time2}
         )).isEqualTo(
-                Arrays.asList("2017-10-11T17:24:36.123456789Z", "2017-10-15T16:28:40.123456789Z")
+                Arrays.asList("2017-10-11", "2017-10-15")
         );
     }
 
@@ -316,13 +316,13 @@ public class DefaultSearchConversionServiceTest {
         assertThat(convertCollection(
                 Arrays.asList(time1, time2)
         )).isEqualTo(
-                Arrays.asList("2017-10-11T17:24:36.123456789+11:00[Australia/Sydney]", "2017-10-15T16:28:40.123456789+11:00[Australia/Sydney]")
+                Arrays.asList("2017-10-11", "2017-10-15")
         );
 
         assertThat(convertCollection(
                 new ZonedDateTime[]{time1, time2}
         )).isEqualTo(
-                Arrays.asList("2017-10-11T17:24:36.123456789+11:00[Australia/Sydney]", "2017-10-15T16:28:40.123456789+11:00[Australia/Sydney]")
+                Arrays.asList("2017-10-11", "2017-10-15")
         );
     }
 

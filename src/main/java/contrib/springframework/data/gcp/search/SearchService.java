@@ -1,11 +1,11 @@
 package contrib.springframework.data.gcp.search;
 
-import com.google.common.base.Functions;
 import contrib.springframework.data.gcp.search.query.QueryBuilder;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,7 +16,7 @@ import java.util.stream.Stream;
  */
 public interface SearchService {
     /**
-     * Begin a search query.
+     * Begin a search filter.
      *
      * @param entityClass For this entity class.
      * @param <E>         Entity type.
@@ -37,6 +37,68 @@ public interface SearchService {
 
     /**
      * Add an entity to the search indexes.
+     *
+     * @param entity The entity.
+     * @param <E>    Entity type.
+     */
+    default <E> void index(E entity) {
+        indexAsync(entity).run();
+    }
+
+    /**
+     * Add an entity to the search indexes with the specified id.
+     *
+     * @param entity The entity.
+     * @param id     The id to store against.
+     * @param <E>    Entity type.
+     */
+    default <E> void index(E entity, String id) {
+        indexAsync(entity, id).run();
+    }
+
+    /**
+     * Add a collection of entities to the search indexes.
+     *
+     * @param entities Collection of entities to save.
+     * @param <E>      Entity type.
+     */
+    default <E> void index(Collection<E> entities) {
+        indexAsync(entities).run();
+    }
+
+    /**
+     * Add a collection of entities to the search indexes.
+     *
+     * @param entities Collection of entities to save.
+     * @param <E>      Entity type.
+     */
+    default <E> void index(Stream<E> entities) {
+        indexAsync(entities.collect(Collectors.toList())).run();
+    }
+
+    /**
+     * Add a collection of entities to the search indexes.
+     *
+     * @param entities Collection of entities to save.
+     * @param <E>      Entity type.
+     */
+    @SuppressWarnings("unchecked")
+    default <E> void index(E... entities) {
+        indexAsync(Arrays.asList(entities)).run();
+    }
+
+    /**
+     * Add a collection of entities to the search indexes with specified ids.
+     *
+     * @param entities Map of entities keyed by the entity id.
+     * @param <E>      Entity type.
+     */
+    default <E> void index(Map<String, E> entities) {
+        indexAsync(entities).run();
+    }
+
+    /**
+     * Add an entity to the search indexes.
      * Note: The index operation is performed asynchronously. The returned {@link Runnable} can be invoked to
      * wait for the operation to complete
      *
@@ -45,8 +107,8 @@ public interface SearchService {
      * @return Index operation completion hook.
      */
     @Nonnull
-    default <E> Runnable index(E entity) {
-        return index(entity, getId(entity));
+    default <E> Runnable indexAsync(E entity) {
+        return indexAsync(entity, getId(entity));
     }
 
     /**
@@ -60,7 +122,7 @@ public interface SearchService {
      * @return Index operation completion hook.
      */
     @Nonnull
-    <E> Runnable index(E entity, String id);
+    <E> Runnable indexAsync(E entity, String id);
 
     /**
      * Add a collection of entities to the search indexes.
@@ -72,14 +134,11 @@ public interface SearchService {
      * @return Index operation completion hook.
      */
     @Nonnull
-    default <E> Runnable index(Collection<E> entities) {
-        return index(
-                entities.stream()
-                        .collect(Collectors.toMap(
-                                this::getId,
-                                Functions.identity()
-                        ))
-        );
+    default <E> Runnable indexAsync(Collection<E> entities) {
+        Map<String, Object> map = new HashMap<>();
+        entities.forEach(entity -> map.put(getId(entity), entity));
+
+        return indexAsync(map);
     }
 
     /**
@@ -92,8 +151,8 @@ public interface SearchService {
      * @return Index operation completion hook.
      */
     @Nonnull
-    default <E> Runnable index(Stream<E> entities) {
-        return index(entities.collect(Collectors.toList()));
+    default <E> Runnable indexAsync(Stream<E> entities) {
+        return indexAsync(entities.collect(Collectors.toList()));
     }
 
     /**
@@ -107,8 +166,8 @@ public interface SearchService {
      */
     @Nonnull
     @SuppressWarnings("unchecked")
-    default <E> Runnable index(E... entities) {
-        return index(Arrays.asList(entities));
+    default <E> Runnable indexAsync(E... entities) {
+        return indexAsync(Arrays.asList(entities));
     }
 
     /**
@@ -121,7 +180,7 @@ public interface SearchService {
      * @return Index operation completion hook.
      */
     @Nonnull
-    <E> Runnable index(Map<String, E> entities);
+    <E> Runnable indexAsync(Map<String, E> entities);
 
     /**
      * Remove an entity from the search indexes by id.

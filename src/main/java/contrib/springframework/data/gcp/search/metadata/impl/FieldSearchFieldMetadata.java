@@ -1,25 +1,24 @@
 package contrib.springframework.data.gcp.search.metadata.impl;
 
-import contrib.springframework.data.gcp.search.metadata.Accessor;
+import contrib.springframework.data.gcp.search.SearchIndex;
+import contrib.springframework.data.gcp.search.metadata.SearchFieldMetadata;
 import contrib.springframework.data.gcp.search.metadata.IndexTypeRegistry;
 import contrib.springframework.data.gcp.search.IndexType;
-import contrib.springframework.data.gcp.search.SearchIndex;
 import org.springframework.util.Assert;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.function.Function;
 
 /**
- * {@link Method} {@link Accessor}.
+ * {@link Field} {@link SearchFieldMetadata}.
  */
-public class MethodAccessor implements Accessor {
-    private static final Function<Method, String> NAME_CALCULATOR = new MethodNameCalculator();
+public class FieldSearchFieldMetadata implements SearchFieldMetadata {
+    private static final Function<Field, String> NAME_CALCULATOR = new FieldNameLocator();
     private static final Function<String, String> NAME_ENCODER = new FieldNameEncoder();
 
     private final Class<?> entityType;
-    private final Method method;
+    private final Field field;
     private final String indexName;
     private final String encodedName;
     private final IndexType indexType;
@@ -28,15 +27,15 @@ public class MethodAccessor implements Accessor {
      * Create a new instance.
      *
      * @param entityType Entity class.
-     * @param method     For this method.
-     * @param indexType  Search index type for this method.
+     * @param field      For this field.
+     * @param indexType  Search index type for this field.
      */
-    public MethodAccessor(Class<?> entityType, Method method, IndexType indexType) {
-        Assert.isTrue(indexType != IndexType.AUTO, "Cannot construct an Accessor with index type AUTO. Use an IndexTypeRegistry instead.");
+    public FieldSearchFieldMetadata(Class<?> entityType, Field field, IndexType indexType) {
+        Assert.isTrue(indexType != IndexType.AUTO, "Cannot construct an SearchFieldMetadata with index type AUTO. Use an IndexTypeRegistry instead.");
 
         this.entityType = entityType;
-        this.method = method;
-        this.indexName = NAME_CALCULATOR.apply(method);
+        this.field = field;
+        this.indexName = NAME_CALCULATOR.apply(field);
         this.encodedName = NAME_ENCODER.apply(indexName);
         this.indexType = indexType;
     }
@@ -45,18 +44,18 @@ public class MethodAccessor implements Accessor {
      * Create a new instance.
      *
      * @param entityType        Entity class.
-     * @param method            For this method.
+     * @param field             For this field.
      * @param indexTypeRegistry Determine the index type with this lookup.
      */
-    public MethodAccessor(Class<?> entityType, Method method, IndexTypeRegistry indexTypeRegistry) {
+    public FieldSearchFieldMetadata(Class<?> entityType, Field field, IndexTypeRegistry indexTypeRegistry) {
         this.entityType = entityType;
-        this.method = method;
-        this.indexName = NAME_CALCULATOR.apply(method);
+        this.field = field;
+        this.indexName = NAME_CALCULATOR.apply(field);
         this.encodedName = NAME_ENCODER.apply(indexName);
 
-        SearchIndex annotation = method.getDeclaredAnnotation(SearchIndex.class);
+        SearchIndex annotation = field.getDeclaredAnnotation(SearchIndex.class);
         if (annotation == null || annotation.type() == IndexType.AUTO) {
-            this.indexType = indexTypeRegistry.apply(method.getGenericReturnType());
+            this.indexType = indexTypeRegistry.apply(field.getGenericType());
         } else {
             this.indexType = annotation.type();
         }
@@ -68,13 +67,13 @@ public class MethodAccessor implements Accessor {
     }
 
     @Override
-    public Method getMember() {
-        return method;
+    public Field getMember() {
+        return field;
     }
 
     @Override
     public Type getMemberType() {
-        return method.getGenericReturnType();
+        return field.getGenericType();
     }
 
     @Override
@@ -95,8 +94,9 @@ public class MethodAccessor implements Accessor {
     @Override
     public Object getValue(Object entity) {
         try {
-            return method.invoke(entity);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+            field.setAccessible(true);
+            return field.get(entity);
+        } catch (IllegalAccessException e) {
             throw new UnsupportedOperationException(e);
         }
     }

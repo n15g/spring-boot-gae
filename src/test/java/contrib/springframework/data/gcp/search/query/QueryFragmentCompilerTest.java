@@ -45,9 +45,9 @@ public class QueryFragmentCompilerTest {
 
     @Test
     public void apply_willConvert_whenInputIsRawFragment() {
-        Query.Fragment fragment = new RawQueryFragment("Some query");
+        Query.Fragment fragment = new ValueFragment("Some filter");
 
-        assertThat(compiler.apply(fragment)).isEqualTo("Some query");
+        assertThat(compiler.apply(fragment)).isEqualTo("Some filter");
     }
 
     @Test
