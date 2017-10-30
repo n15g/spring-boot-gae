@@ -21,7 +21,7 @@ To install the library to your local maven repository (to use it in other projec
 ./gradlew install
 ```
 
-### `SearchRepository`
+### SearchRepository
 Repositories extending`SearchRepository` will automatically index saved entities in the `SearchService` using
 the entity's `Key#toWebSafeKey()` as the `@SearchId`.
 
