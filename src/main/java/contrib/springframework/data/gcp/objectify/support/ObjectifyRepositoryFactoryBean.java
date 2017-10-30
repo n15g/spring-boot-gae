@@ -1,6 +1,7 @@
 package contrib.springframework.data.gcp.objectify.support;
 
 import contrib.springframework.data.gcp.objectify.ObjectifyProxy;
+import contrib.springframework.data.gcp.search.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.repository.Repository;
@@ -22,6 +23,7 @@ public class ObjectifyRepositoryFactoryBean<T extends Repository<E, I>, E, I ext
         extends RepositoryFactoryBeanSupport<T, E, I> {
 
     private ObjectifyProxy objectify;
+    private SearchService searchService;
 
     /**
      * Creates a new {@link ObjectifyRepositoryFactoryBean} for the given repository interface.
@@ -42,6 +44,16 @@ public class ObjectifyRepositoryFactoryBean<T extends Repository<E, I>, E, I ext
         this.objectify = objectify;
     }
 
+    /**
+     * Set the reference to the search service.
+     *
+     * @param searchService Search service.
+     */
+    @Autowired
+    public void setSearchService(SearchService searchService) {
+        this.searchService = searchService;
+    }
+
     @Override
     public void setMappingContext(MappingContext<?, ?> mappingContext) {
         super.setMappingContext(mappingContext);
@@ -55,6 +67,6 @@ public class ObjectifyRepositoryFactoryBean<T extends Repository<E, I>, E, I ext
 
     @Override
     protected RepositoryFactorySupport createRepositoryFactory() {
-        return new ObjectifyRepositoryFactory(objectify);
+        return new ObjectifyRepositoryFactory(objectify, searchService);
     }
 }

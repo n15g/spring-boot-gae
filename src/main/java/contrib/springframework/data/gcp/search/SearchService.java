@@ -57,6 +57,16 @@ public interface SearchService {
     }
 
     /**
+     * Add a collection of entities to the search indexes with specified ids.
+     *
+     * @param entities Map of entities keyed by the entity id.
+     * @param <E>      Entity type.
+     */
+    default <E> void index(Map<String, E> entities) {
+        indexAsync(entities).run();
+    }
+
+    /**
      * Add a collection of entities to the search indexes.
      *
      * @param entities Collection of entities to save.
@@ -85,16 +95,6 @@ public interface SearchService {
     @SuppressWarnings("unchecked")
     default <E> void index(E... entities) {
         indexAsync(Arrays.asList(entities)).run();
-    }
-
-    /**
-     * Add a collection of entities to the search indexes with specified ids.
-     *
-     * @param entities Map of entities keyed by the entity id.
-     * @param <E>      Entity type.
-     */
-    default <E> void index(Map<String, E> entities) {
-        indexAsync(entities).run();
     }
 
     /**

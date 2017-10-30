@@ -12,7 +12,7 @@ public enum Operator {
     /**
      * Alias for {@link #EQUAL}.
      */
-    E("="),
+    EQ("="),
 
     /**
      * Is {@literal A} lesser in value than {@literal B}?

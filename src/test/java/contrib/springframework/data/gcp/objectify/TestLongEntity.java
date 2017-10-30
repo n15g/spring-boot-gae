@@ -5,6 +5,7 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.openpojo.business.BusinessIdentity;
 import com.openpojo.business.annotation.BusinessKey;
+import contrib.springframework.data.gcp.search.SearchIndex;
 
 import javax.annotation.Nullable;
 
@@ -15,6 +16,7 @@ public class TestLongEntity {
     private Long id;
 
     @Index
+    @SearchIndex
     private String name;
 
     private TestLongEntity() {

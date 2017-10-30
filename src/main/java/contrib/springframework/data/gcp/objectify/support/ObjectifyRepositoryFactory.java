@@ -1,6 +1,7 @@
 package contrib.springframework.data.gcp.objectify.support;
 
 import contrib.springframework.data.gcp.objectify.ObjectifyProxy;
+import contrib.springframework.data.gcp.search.SearchService;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
@@ -15,37 +16,32 @@ import java.io.Serializable;
 public class ObjectifyRepositoryFactory extends RepositoryFactorySupport {
 
     private final ObjectifyProxy objectify;
+    private final SearchService searchService;
 
     /**
      * Create a new instance.
      *
-     * @param objectify Objectify proxy.
+     * @param objectify     Objectify proxy.
+     * @param searchService Search service.
      */
-    public ObjectifyRepositoryFactory(@Nonnull ObjectifyProxy objectify) {
+    public ObjectifyRepositoryFactory(@Nonnull ObjectifyProxy objectify, SearchService searchService) {
         Assert.notNull(objectify, String.format("%s must not be null!", ObjectifyProxy.class));
 
         this.objectify = objectify;
+        this.searchService = searchService;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     protected Object getTargetRepository(RepositoryInformation information) {
-        return new BaseObjectifyRepository(objectify, information.getDomainType(), information.getIdType());
+        return new BaseObjectifyRepository(objectify, searchService, information.getDomainType(), information.getIdType());
     }
 
     @Override
     protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
-
         return BaseObjectifyRepository.class;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.springframework.data.repository.support.RepositoryFactorySupport#
-     * getEntityInformation(java.lang.Class)
-     */
     @Override
     @SuppressWarnings("unchecked")
     public <T, ID extends Serializable> ObjectifyEntityInformation<T, ID> getEntityInformation(Class<T> entityType) {

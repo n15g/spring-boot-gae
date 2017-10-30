@@ -1,6 +1,5 @@
 package contrib.springframework.data.gcp.objectify.repository;
 
-import contrib.springframework.data.gcp.search.NoOpSearchService;
 import contrib.springframework.data.gcp.search.SearchService;
 
 import javax.annotation.Nonnull;
@@ -16,7 +15,11 @@ import java.io.Serializable;
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 public abstract class AbstractSearchRepository<E, I extends Serializable> extends AbstractRepository<E, I> implements SearchRepository<E, I> {
 
-    private SearchService searchService = new NoOpSearchService();
+    private final SearchService searchService;
+
+    protected AbstractSearchRepository(SearchService searchService) {
+        this.searchService = searchService;
+    }
 
     @Nonnull
     @Override

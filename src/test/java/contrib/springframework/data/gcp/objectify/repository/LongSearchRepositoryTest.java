@@ -1,6 +1,7 @@
 package contrib.springframework.data.gcp.objectify.repository;
 
 import contrib.springframework.data.gcp.objectify.TestLongEntity;
+import contrib.springframework.data.gcp.search.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,11 +21,14 @@ public class LongSearchRepositoryTest extends LongSearchRepositoryTests {
     @Configuration
     public static class Config {
         @Bean
-        public TestLongSearchRepository testRepository() {
-            return new TestLongSearchRepository();
+        public TestLongSearchRepository testRepository(SearchService searchService) {
+            return new TestLongSearchRepository(searchService);
         }
     }
 
     public static class TestLongSearchRepository extends AbstractSearchRepository<TestLongEntity, Long> {
+        public TestLongSearchRepository(SearchService searchService) {
+            super(searchService);
+        }
     }
 }

@@ -11,7 +11,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -50,7 +52,7 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
      */
     @Nonnull
     default Runnable index(E entity) {
-        return getSearchService().indexAsync(getKey(entity), entity);
+        return getSearchService().indexAsync(entity, getKey(entity).toWebSafeString());
     }
 
     /**
@@ -62,7 +64,10 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
      */
     @Nonnull
     default Runnable index(Collection<E> batch) {
-        return getSearchService().indexAsync(toKeyMap(batch));
+        Map<String, E> toIndex = new HashMap<>();
+        toKeyMap(batch).forEach((key, entity) -> toIndex.put(key.toWebSafeString(), entity));
+
+        return getSearchService().indexAsync(toIndex);
     }
 
     /**
@@ -116,7 +121,7 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
      * @param key Key of the entity to remove.
      */
     default void unindexByKey(Key<E> key) {
-        getSearchService().unindex(getEntityType(), key.getName());
+        getSearchService().unindex(getEntityType(), key.toWebSafeString());
     }
 
     /**
@@ -126,7 +131,7 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
      * @param keys Keys of the entities to remove.
      */
     default void unindexByKey(Collection<Key<E>> keys) {
-        getSearchService().unindex(getEntityType(), keys.stream().map(Key::getName));
+        getSearchService().unindex(getEntityType(), keys.stream().map(Key::toWebSafeString));
     }
 
     /**
