@@ -44,9 +44,3 @@ Not all of the limitations of the Search API are enforced by the framework, if i
 ### Updating the Library Version
 
 Update the `version` property in `gradle.properties`.
-
-
-## TODO
-* `ExceptionTranslationPostProcessor`.
-* `@Transactional` support.
-* `QueryLookupStrategy`.
