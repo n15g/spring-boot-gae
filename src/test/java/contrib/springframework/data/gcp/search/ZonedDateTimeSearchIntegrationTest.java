@@ -1,7 +1,6 @@
 package contrib.springframework.data.gcp.search;
 
-import com.google.appengine.api.search.Results;
-import com.google.appengine.api.search.ScoredDocument;
+import contrib.springframework.data.gcp.search.query.Query;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,11 +25,11 @@ public class ZonedDateTimeSearchIntegrationTest extends SearchTest {
                 new TestEntity("id3", ZonedDateTime.parse("2017-01-03T01:02:03Z"))
         ));
 
-        Results<ScoredDocument> results = searchService.search(TestEntity.class)
+        Query<TestEntity> query = searchService.createQuery(TestEntity.class)
                 .filter("value", EQUAL, ZonedDateTime.parse("2017-01-02T01:02:03Z"))
-                .execute();
+                .build();
 
-        assertThat(results)
+        assertThat(searchService.execute(query))
                 .extractingResultOf("getId")
                 .containsExactly("id2");
     }
@@ -44,11 +43,11 @@ public class ZonedDateTimeSearchIntegrationTest extends SearchTest {
                 new TestEntity("id4", ZonedDateTime.parse("2017-01-03T01:02:03Z"))
         ));
 
-        Results<ScoredDocument> results = searchService.search(TestEntity.class)
+        Query<TestEntity> query = searchService.createQuery(TestEntity.class)
                 .filter("value", GREATER_THAN, ZonedDateTime.parse("2017-01-02T01:02:03Z"))
-                .execute();
+                .build();
 
-        assertThat(results)
+        assertThat(searchService.execute(query))
                 .extractingResultOf("getId")
                 .containsExactlyInAnyOrder("id4");
     }
@@ -62,11 +61,11 @@ public class ZonedDateTimeSearchIntegrationTest extends SearchTest {
                 new TestEntity("id4", ZonedDateTime.parse("2017-01-03T01:02:03Z"))
         ));
 
-        Results<ScoredDocument> results = searchService.search(TestEntity.class)
+        Query<TestEntity> query = searchService.createQuery(TestEntity.class)
                 .filter("value", GREATER_THAN_OR_EQUAL, ZonedDateTime.parse("2017-01-02T01:02:03Z"))
-                .execute();
+                .build();
 
-        assertThat(results)
+        assertThat(searchService.execute(query))
                 .extractingResultOf("getId")
                 .containsExactlyInAnyOrder("id2", "id3", "id4");
     }

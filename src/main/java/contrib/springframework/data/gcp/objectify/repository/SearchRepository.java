@@ -3,7 +3,9 @@ package contrib.springframework.data.gcp.objectify.repository;
 import com.googlecode.objectify.Key;
 import contrib.springframework.data.gcp.search.SearchIndex;
 import contrib.springframework.data.gcp.search.SearchService;
+import contrib.springframework.data.gcp.search.query.Query;
 import contrib.springframework.data.gcp.search.query.QueryBuilder;
+import contrib.springframework.data.gcp.search.query.Result;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import javax.annotation.Nonnull;
@@ -40,7 +42,19 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
      */
     @Nonnull
     default QueryBuilder<E> search() {
-        return getSearchService().search(getEntityType());
+        return getSearchService()
+                .createQuery(getEntityType())
+                .retrieveIdsOnly(); //Only ids are needed by default, we load the entities from these ids. 
+    }
+
+    /**
+     * Execute a search query.
+     *
+     * @param query Search query.
+     * @return Search result.
+     */
+    default Result<E> execute(Query<E> query) {
+        return getSearchService().execute(query, new SearchResultLoader<>(this::findAllByWebSafeKey));
     }
 
     /**

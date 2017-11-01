@@ -14,11 +14,13 @@ import contrib.springframework.data.gcp.search.misc.IndexOperation;
 import contrib.springframework.data.gcp.search.query.Query;
 import contrib.springframework.data.gcp.search.query.QueryBuilder;
 import contrib.springframework.data.gcp.search.query.QueryCompiler;
-import contrib.springframework.data.gcp.search.query.QueryExecutor;
 import contrib.springframework.data.gcp.search.query.QueryImpl;
+import contrib.springframework.data.gcp.search.query.Result;
+import contrib.springframework.data.gcp.search.query.ResultImpl;
 import org.springframework.core.convert.ConversionService;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +31,7 @@ import static com.google.common.util.concurrent.Runnables.doNothing;
 /**
  * {@link SearchService} implementation.
  */
-public class SearchServiceImpl implements SearchService, QueryExecutor {
+public class SearchServiceImpl implements SearchService {
 
     private final SearchMetadata searchMetadata;
     private final DocumentBuilder documentBuilder;
@@ -51,8 +53,16 @@ public class SearchServiceImpl implements SearchService, QueryExecutor {
 
     @Nonnull
     @Override
-    public <E> QueryBuilder<E> search(Class<E> entityClass) {
-        return new QueryImpl<>(entityClass, this);
+    public <E> QueryBuilder<E> createQuery(Class<E> entityClass) {
+        return new QueryImpl<>(entityClass);
+    }
+
+    @Override
+    public Result<ScoredDocument> execute(Query<?> query) {
+        Results<ScoredDocument> result = getIndex(query.getResultType())
+                .search(queryCompiler.apply(query));
+
+        return new ResultImpl<>(result, x -> new ArrayList<>(x.getResults()));
     }
 
     @Override
@@ -123,13 +133,6 @@ public class SearchServiceImpl implements SearchService, QueryExecutor {
             unindex(entityClass, documents.stream().map(Document::getId));
         }
         return count;
-    }
-
-    @Nonnull
-    @Override
-    public Results<ScoredDocument> executeQuery(Query<?> query) {
-        return getIndex(query.getResultType())
-                .search(queryCompiler.apply(query));
     }
 
     private List<Document> getDocumentIds(Index index, GetRequest request) {

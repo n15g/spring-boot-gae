@@ -1,8 +1,5 @@
 package contrib.springframework.data.gcp.search.query;
 
-import com.google.appengine.api.search.Results;
-import com.google.appengine.api.search.ScoredDocument;
-import com.googlecode.objectify.Result;
 import contrib.springframework.data.gcp.search.Operator;
 import contrib.springframework.data.gcp.search.SearchService;
 import org.springframework.data.domain.Sort;
@@ -142,12 +139,4 @@ public interface QueryBuilder<E> {
      */
     @Nonnull
     Query<E> build();
-
-    /**
-     * Execute the filter and return the {@link Result}.
-     *
-     * @return Search result.
-     */
-    @Nonnull
-    Results<ScoredDocument> execute();
 }

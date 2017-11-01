@@ -1,7 +1,6 @@
 package contrib.springframework.data.gcp.search;
 
-import com.google.appengine.api.search.Results;
-import com.google.appengine.api.search.ScoredDocument;
+import contrib.springframework.data.gcp.search.query.Query;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,11 +22,11 @@ public class StringSearchIntegrationTest extends SearchTest {
                 new TestSearchEntity("id3").setStringField("string3")
         ));
 
-        Results<ScoredDocument> results = searchService.search(TestSearchEntity.class)
+        Query<TestSearchEntity> query = searchService.createQuery(TestSearchEntity.class)
                 .filter("stringField", EQUAL, "string2")
-                .execute();
+                .build();
 
-        assertThat(results)
+        assertThat(searchService.execute(query))
                 .extractingResultOf("getId")
                 .containsExactly("id2");
     }
@@ -41,11 +40,11 @@ public class StringSearchIntegrationTest extends SearchTest {
                 new TestSearchEntity("id4").setStringArrayField(new String[]{"juliet", "kilo", "lima"})
         ));
 
-        Results<ScoredDocument> results = searchService.search(TestSearchEntity.class)
+        Query<TestSearchEntity> query = searchService.createQuery(TestSearchEntity.class)
                 .filterIn("stringArrayField", EQUAL, "bravo", "foxtrot", "juliet")
-                .execute();
+                .build();
 
-        assertThat(results)
+        assertThat(searchService.execute(query))
                 .extractingResultOf("getId")
                 .containsExactlyInAnyOrder("id1", "id2", "id4");
     }
@@ -59,11 +58,11 @@ public class StringSearchIntegrationTest extends SearchTest {
                 new TestSearchEntity("id4").setStringListField(Arrays.asList("juliet", "kilo", "lima"))
         ));
 
-        Results<ScoredDocument> results = searchService.search(TestSearchEntity.class)
+        Query<TestSearchEntity> query = searchService.createQuery(TestSearchEntity.class)
                 .filterIn("stringListField", EQUAL, "bravo", "foxtrot", "juliet")
-                .execute();
+                .build();
 
-        assertThat(results)
+        assertThat(searchService.execute(query))
                 .extractingResultOf("getId")
                 .containsExactlyInAnyOrder("id1", "id2", "id4");
     }
@@ -76,11 +75,11 @@ public class StringSearchIntegrationTest extends SearchTest {
                 new TestSearchEntity("id3").setStringField("hecka no").setStringListField(Arrays.asList("not here", "or here", "nor here"))
         ));
 
-        Results<ScoredDocument> results = searchService.search(TestSearchEntity.class)
+        Query<TestSearchEntity> query = searchService.createQuery(TestSearchEntity.class)
                 .filter("match")
-                .execute();
+                .build();
 
-        assertThat(results)
+        assertThat(searchService.execute(query))
                 .extractingResultOf("getId")
                 .containsExactlyInAnyOrder("id1", "id2");
     }
@@ -94,11 +93,11 @@ public class StringSearchIntegrationTest extends SearchTest {
                 new TestSearchEntity("id4").setStringField(null).setStringListField(null)
         ));
 
-        Results<ScoredDocument> results = searchService.search(TestSearchEntity.class)
+        Query<TestSearchEntity> query = searchService.createQuery(TestSearchEntity.class)
                 .filter("match")
-                .execute();
+                .build();
 
-        assertThat(results)
+        assertThat(searchService.execute(query))
                 .extractingResultOf("getId")
                 .containsExactlyInAnyOrder("id1", "id2", "id3");
     }

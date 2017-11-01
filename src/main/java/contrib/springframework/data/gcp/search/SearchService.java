@@ -1,12 +1,19 @@
 package contrib.springframework.data.gcp.search;
 
+import com.google.appengine.api.search.Results;
+import com.google.appengine.api.search.ScoredDocument;
+import contrib.springframework.data.gcp.search.query.Query;
 import contrib.springframework.data.gcp.search.query.QueryBuilder;
+import contrib.springframework.data.gcp.search.query.Result;
+import contrib.springframework.data.gcp.search.query.ResultImpl;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,7 +30,29 @@ public interface SearchService {
      * @return Query builder.
      */
     @Nonnull
-    <E> QueryBuilder<E> search(Class<E> entityClass);
+    <E> QueryBuilder<E> createQuery(Class<E> entityClass);
+
+    /**
+     * Execute a {@link Query}, returning the result.
+     *
+     * @param query The query.
+     * @return Query result
+     */
+    Result<ScoredDocument> execute(Query<?> query);
+
+    /**
+     * Execute a {@link Query}, returning the result.
+     *
+     * @param query             The query.
+     * @param resultTransformer Transformer used to transform the result.
+     * @param <T>               Result type.
+     * @return Query result
+     */
+    default <T> Result<T> execute(Query<?> query, Function<Results<ScoredDocument>, List<T>> resultTransformer) {
+        Results<ScoredDocument> rawResult = execute(query).getMetadata();
+
+        return new ResultImpl<>(rawResult, resultTransformer);
+    }
 
     /**
      * Get the id of a search entity.

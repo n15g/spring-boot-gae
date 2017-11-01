@@ -1,6 +1,9 @@
 package contrib.springframework.data.gcp.search;
 
+import com.google.appengine.api.search.ScoredDocument;
+import contrib.springframework.data.gcp.search.query.Query;
 import contrib.springframework.data.gcp.search.query.QueryBuilder;
+import contrib.springframework.data.gcp.search.query.Result;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -12,10 +15,18 @@ import static com.google.common.util.concurrent.Runnables.doNothing;
  * A no-operation {@link SearchService} implementation.
  */
 public class NoOpSearchService implements SearchService {
+
+    private static final String NOPE = "Search is not currently supported, please register an operational SearchService for this entity type.";
+
     @Nonnull
     @Override
-    public <E> QueryBuilder<E> search(Class<E> entityClass) {
-        throw new java.lang.UnsupportedOperationException("Search is not currently supported, please register an operational SearchService for this entity type.");
+    public <E> QueryBuilder<E> createQuery(Class<E> entityClass) {
+        throw new java.lang.UnsupportedOperationException(NOPE);
+    }
+
+    @Override
+    public Result<ScoredDocument> execute(Query<?> query) {
+        throw new java.lang.UnsupportedOperationException(NOPE);
     }
 
     @Override

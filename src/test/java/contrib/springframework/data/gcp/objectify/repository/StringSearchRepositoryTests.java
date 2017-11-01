@@ -1,10 +1,8 @@
 package contrib.springframework.data.gcp.objectify.repository;
 
-import com.google.appengine.api.search.Results;
-import com.google.appengine.api.search.ScoredDocument;
-import com.googlecode.objectify.Key;
 import contrib.springframework.data.gcp.objectify.TestStringEntity;
 import contrib.springframework.data.gcp.search.Operator;
+import contrib.springframework.data.gcp.search.query.Query;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -67,17 +65,19 @@ public abstract class StringSearchRepositoryTests extends StringRepositoryTests 
 
     @Test
     public void save_willIndexInSearchService() {
+        TestStringEntity target = new TestStringEntity("id2").setName("name2");
         getRepository().save(
                 new TestStringEntity("id1").setName("name1"),
-                new TestStringEntity("id2").setName("name2"),
+                target,
                 new TestStringEntity("id3").setName("name3")
         );
 
-        Results<ScoredDocument> result = getRepository().search()
+        Query<TestStringEntity> query = getRepository().search()
                 .filter("name", Operator.EQ, "name2")
-                .execute();
+                .build();
 
-        assertThat(result).extractingResultOf("getId").containsExactly(Key.create(TestStringEntity.class, "id2").toWebSafeString());
+        assertThat(getRepository().execute(query))
+                .containsExactly(target);
     }
 
     @Test
@@ -90,15 +90,17 @@ public abstract class StringSearchRepositoryTests extends StringRepositoryTests 
                 target
         );
 
-        Results<ScoredDocument> preDelete = getRepository().search()
+        Query<TestStringEntity> preDeleteQuery = getRepository().search()
                 .filter("name", Operator.EQ, target.getName())
-                .execute();
-        assertThat(preDelete).extractingResultOf("getId").containsExactly(Key.create(target).toWebSafeString());
+                .build();
+        assertThat(getRepository().execute(preDeleteQuery))
+                .containsExactly(target);
 
         getRepository().delete(target);
-        Results<ScoredDocument> postDelete = getRepository().search()
+        Query<TestStringEntity> postDeleteQuery = getRepository().search()
                 .filter("name", Operator.EQ, target.getName())
-                .execute();
-        assertThat(postDelete).extractingResultOf("getId").isEmpty();
+                .build();
+        assertThat(getRepository().execute(postDeleteQuery))
+                .isEmpty();
     }
 }

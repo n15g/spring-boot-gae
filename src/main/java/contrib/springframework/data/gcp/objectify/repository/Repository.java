@@ -120,6 +120,42 @@ public interface Repository<E, I extends Serializable> extends AsyncRepository<E
     }
 
     /**
+     * Get the entities with the given web-safe key strings, if they exist.
+     *
+     * @param webSafeStrings List of keys to load.
+     * @return A map of loaded entities keyed by the web-safe key string.
+     */
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    default Map<String, Optional<E>> findAllByWebSafeKey(Collection<String> webSafeStrings) {
+        List<Key<E>> keys = webSafeStrings.stream()
+                .map(string -> (Key<E>) Key.create(string))
+                .collect(Collectors.toList());
+
+        return ofy()
+                .load()
+                .keys(keys)
+                .entrySet()
+                .parallelStream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().toWebSafeString(),
+                        entry -> Optional.ofNullable(entry.getValue())
+                ));
+    }
+
+    /**
+     * Get the entities with the given web-safe key strings, if they exist.
+     *
+     * @param webSafeStrings List of keys to load.
+     * @return A map of loaded entities keyed by the web-safe key string.
+     */
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    default Map<String, Optional<E>> findAllByWebSafeKey(String... webSafeStrings) {
+        return findAllByWebSafeKey(Arrays.asList(webSafeStrings));
+    }
+
+    /**
      * Get all entities whose field has the value of the given object.
      * Note that the given field must be indexed for anything to be returned.
      * This will load all entities into memory, so should only be used where the number of entities is constrained.
@@ -181,6 +217,22 @@ public interface Repository<E, I extends Serializable> extends AsyncRepository<E
                 ofy()
                         .load()
                         .key(key)
+                        .now()
+        );
+    }
+
+    /**
+     * Find an entity by its web-safe key string.
+     *
+     * @param webSafeString Entity string.
+     * @return The entity or an empty {@link Optional} if none exists.
+     */
+    @SuppressWarnings("unchecked")
+    default Optional<E> findOneByWebSafeKey(String webSafeString) {
+        return Optional.ofNullable(
+                ofy()
+                        .load()
+                        .key((Key<E>) Key.create(webSafeString))
                         .now()
         );
     }

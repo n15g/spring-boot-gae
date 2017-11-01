@@ -1,7 +1,6 @@
 package contrib.springframework.data.gcp.search;
 
-import com.google.appengine.api.search.Results;
-import com.google.appengine.api.search.ScoredDocument;
+import contrib.springframework.data.gcp.search.query.Query;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,11 +26,11 @@ public class BigDecimalSearchIntegrationTest extends SearchTest {
                 new TestEntity("id3", BigDecimal.TEN)
         ));
 
-        Results<ScoredDocument> results = searchService.search(TestEntity.class)
+        Query<TestEntity> query = searchService.createQuery(TestEntity.class)
                 .filter("value", EQUAL, BigDecimal.ONE)
-                .execute();
+                .build();
 
-        assertThat(results)
+        assertThat(searchService.execute(query))
                 .extractingResultOf("getId")
                 .containsExactly("id2");
     }
@@ -45,11 +44,11 @@ public class BigDecimalSearchIntegrationTest extends SearchTest {
                 new TestEntity("id4", valueOf(11))
         ));
 
-        Results<ScoredDocument> results = searchService.search(TestEntity.class)
+        Query<TestEntity> query = searchService.createQuery(TestEntity.class)
                 .filter("value", GREATER_THAN, valueOf(10))
-                .execute();
+                .build();
 
-        assertThat(results)
+        assertThat(searchService.execute(query))
                 .extractingResultOf("getId")
                 .containsExactlyInAnyOrder("id3", "id4");
     }
@@ -63,11 +62,11 @@ public class BigDecimalSearchIntegrationTest extends SearchTest {
                 new TestEntity("id4", valueOf(11))
         ));
 
-        Results<ScoredDocument> results = searchService.search(TestEntity.class)
+        Query<TestEntity> query = searchService.createQuery(TestEntity.class)
                 .filter("value", GREATER_THAN_OR_EQUAL, valueOf(10))
-                .execute();
+                .build();
 
-        assertThat(results)
+        assertThat(searchService.execute(query))
                 .extractingResultOf("getId")
                 .containsExactlyInAnyOrder("id2", "id3", "id4");
     }

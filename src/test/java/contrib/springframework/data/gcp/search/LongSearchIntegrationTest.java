@@ -1,7 +1,6 @@
 package contrib.springframework.data.gcp.search;
 
-import com.google.appengine.api.search.Results;
-import com.google.appengine.api.search.ScoredDocument;
+import contrib.springframework.data.gcp.search.query.Query;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,11 +24,11 @@ public class LongSearchIntegrationTest extends SearchTest {
                 new TestSearchEntity("id3").setLongField(3)
         ));
 
-        Results<ScoredDocument> results = searchService.search(TestSearchEntity.class)
+        Query<TestSearchEntity> query = searchService.createQuery(TestSearchEntity.class)
                 .filter("longField", EQUAL, 2)
-                .execute();
+                .build();
 
-        assertThat(results)
+        assertThat(searchService.execute(query))
                 .extractingResultOf("getId")
                 .containsExactly("id2");
     }
@@ -43,11 +42,11 @@ public class LongSearchIntegrationTest extends SearchTest {
                 new TestSearchEntity("id4").setLongField(4)
         ));
 
-        Results<ScoredDocument> results = searchService.search(TestSearchEntity.class)
+        Query<TestSearchEntity> query = searchService.createQuery(TestSearchEntity.class)
                 .filter("longField", GREATER_THAN, 2)
-                .execute();
+                .build();
 
-        assertThat(results)
+        assertThat(searchService.execute(query))
                 .extractingResultOf("getId")
                 .containsExactlyInAnyOrder("id3", "id4");
     }
@@ -61,11 +60,11 @@ public class LongSearchIntegrationTest extends SearchTest {
                 new TestSearchEntity("id4").setLongField(4)
         ));
 
-        Results<ScoredDocument> results = searchService.search(TestSearchEntity.class)
+        Query<TestSearchEntity> query = searchService.createQuery(TestSearchEntity.class)
                 .filter("longField", GREATER_THAN_OR_EQUAL, 2)
-                .execute();
+                .build();
 
-        assertThat(results)
+        assertThat(searchService.execute(query))
                 .extractingResultOf("getId")
                 .containsExactlyInAnyOrder("id2", "id3", "id4");
     }

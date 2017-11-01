@@ -50,6 +50,6 @@ public class QueryStringCompilerIntegrationTest extends ObjectifyTest {
     }
 
     private QueryImpl<TestSearchEntity> query() {
-        return new QueryImpl<>(TestSearchEntity.class, null);
+        return new QueryImpl<>(TestSearchEntity.class);
     }
 }

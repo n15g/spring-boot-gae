@@ -1,7 +1,5 @@
 package contrib.springframework.data.gcp.search.query;
 
-import com.google.appengine.api.search.Results;
-import com.google.appengine.api.search.ScoredDocument;
 import contrib.springframework.data.gcp.search.Operator;
 import org.springframework.data.domain.Sort;
 
@@ -19,7 +17,6 @@ import java.util.Optional;
 public class QueryImpl<E> implements QueryBuilder<E>, Query<E> {
 
     private final Class<E> resultType;
-    private final QueryExecutor queryExecutor;
     private final List<Query.Fragment> fragments = new ArrayList<>();
     private Sort sort = null;
     private Integer limit = null;
@@ -30,12 +27,10 @@ public class QueryImpl<E> implements QueryBuilder<E>, Query<E> {
     /**
      * Create a new instance.
      *
-     * @param resultType    The type of result this filter produces.
-     * @param queryExecutor The executor to use to executeQuery this filter.
+     * @param resultType The type of result this filter produces.
      */
-    public QueryImpl(Class<E> resultType, QueryExecutor queryExecutor) {
+    public QueryImpl(Class<E> resultType) {
         this.resultType = resultType;
-        this.queryExecutor = queryExecutor;
     }
 
     @Nonnull
@@ -107,12 +102,6 @@ public class QueryImpl<E> implements QueryBuilder<E>, Query<E> {
 
     @Nonnull
     @Override
-    public Results<ScoredDocument> execute() {
-        return queryExecutor.executeQuery(this);
-    }
-
-    @Nonnull
-    @Override
     public List<Fragment> getFragments() {
         return fragments;
     }
@@ -145,5 +134,4 @@ public class QueryImpl<E> implements QueryBuilder<E>, Query<E> {
     public boolean isIdsOnly() {
         return idsOnly;
     }
-
 }
