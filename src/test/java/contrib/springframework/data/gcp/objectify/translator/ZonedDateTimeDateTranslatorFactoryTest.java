@@ -28,6 +28,17 @@ public class ZonedDateTimeDateTranslatorFactoryTest {
     }
 
     @Test
+    public void testRoundTrip() throws Exception {
+        ZonedDateTime input = ZonedDateTime.of(2017, 8, 28, 7, 9, 36, 0, ZoneOffset.UTC);
+        ZonedDateTime output = load(save(input)).withZoneSameInstant(ZoneOffset.UTC);
+
+        assertThat(
+                input,
+                is(output)
+        );
+    }
+
+    @Test
     public void testSave_willConvertToUTC_whenInputHasAnotherZoned() throws Exception {
         assertThat(
                 save(ZonedDateTime.of(2017, 8, 29, 3, 9, 36, 42, ZoneOffset.ofHours(10))),

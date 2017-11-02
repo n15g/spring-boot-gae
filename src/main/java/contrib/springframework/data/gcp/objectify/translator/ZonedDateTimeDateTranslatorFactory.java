@@ -1,13 +1,7 @@
 package contrib.springframework.data.gcp.objectify.translator;
 
 import com.googlecode.objectify.impl.Path;
-import com.googlecode.objectify.impl.translate.CreateContext;
-import com.googlecode.objectify.impl.translate.LoadContext;
-import com.googlecode.objectify.impl.translate.SaveContext;
-import com.googlecode.objectify.impl.translate.SkipException;
-import com.googlecode.objectify.impl.translate.TypeKey;
-import com.googlecode.objectify.impl.translate.ValueTranslator;
-import com.googlecode.objectify.impl.translate.ValueTranslatorFactory;
+import com.googlecode.objectify.impl.translate.*;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -36,7 +30,7 @@ public class ZonedDateTimeDateTranslatorFactory extends ValueTranslatorFactory<Z
 
             @Override
             protected Date saveValue(ZonedDateTime value, boolean index, SaveContext ctx, Path path) throws SkipException {
-                return Date.from(value.withZoneSameInstant(ZoneOffset.UTC).toInstant());
+                return Date.from(value.withZoneSameInstant(ZoneOffset.systemDefault()).toInstant());
             }
         };
     }

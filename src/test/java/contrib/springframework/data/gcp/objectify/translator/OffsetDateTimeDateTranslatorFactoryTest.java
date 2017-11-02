@@ -28,6 +28,17 @@ public class OffsetDateTimeDateTranslatorFactoryTest {
     }
 
     @Test
+    public void testRoundTrip() throws Exception {
+        OffsetDateTime input = OffsetDateTime.of(2017, 8, 28, 7, 9, 36, 0, ZoneOffset.UTC);
+        OffsetDateTime output = load(save(input)).withOffsetSameInstant(ZoneOffset.UTC);
+
+        assertThat(
+                input,
+                is(output)
+        );
+    }
+
+    @Test
     public void testSave_willConvertToUTC_whenInputHasAnotherOffset() throws Exception {
         assertThat(
                 save(OffsetDateTime.of(2017, 8, 29, 3, 9, 36, 42, ZoneOffset.ofHours(10))),
