@@ -5,7 +5,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 import java.io.Serializable;
 
 /**
- * An Objectify repository implementing {@link AsyncRepository}, {@link Repository} and {@link SearchRepository} functionality.
+ * Base repository type for {@link org.springframework.stereotype.Repository} injected objectify repositories.
  *
  * @param <E> Entity type.
  * @param <I> Entity id type.

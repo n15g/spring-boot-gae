@@ -8,67 +8,20 @@ import org.springframework.data.repository.Repository;
 
 import javax.annotation.Nonnull;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
 
 /**
- * Objectify repository which supports asynchronous access to entities.
+ * Objectify repository for asynchronously deleting entities.
  * Each call returns a hook to the asynchronous operation that can be used to complete the operation at a later time. The operation
  * will eventually complete (or fail) regardless of whether the hook is used or not, it simply provides a mechanism for callers to
  * optionally wait for the operation to complete (i.e. treat the operation as synchronous) if required.
  *
- * @param <E> The entity type
- * @param <I> The id type of the entity
+ * @param <E> Entity type.
+ * @param <I> Entity id type.
  */
 @NoRepositoryBean
-public interface AsyncRepository<E, I extends Serializable> extends EntityManager<E, I>, Repository<E, I> {
-
-    /**
-     * Put an entity asynchronously asynchronously.
-     *
-     * @param entity The entity to save.
-     * @return Supplier that can be used to return the entity later.
-     */
-    @Nonnull
-    default Supplier<E> saveAsync(final E entity) {
-        final Result<Key<E>> saveOperation = ofy().save().entity(entity);
-        return () -> {
-            saveOperation.now();
-            return entity;
-        };
-    }
-
-    /**
-     * Save the given entities asynchronously.
-     *
-     * @param entities Collection of entities to save.
-     * @return Supplier that can be used to return the collection of saved entities later.
-     */
-    @Nonnull
-    default Supplier<List<E>> saveAsync(final Collection<E> entities) {
-        final Result<Map<Key<E>, E>> saveOperation = ofy().save().entities(entities);
-        return () -> {
-            saveOperation.now();
-            return new ArrayList<>(entities);
-        };
-    }
-
-    /**
-     * Save the given entities asynchronously.
-     *
-     * @param entities Collection of entities to save.
-     * @return Supplier that can be used to return the collection of saved entities later.
-     */
-    @Nonnull
-    @SuppressWarnings("unchecked")
-    default Supplier<List<E>> saveAsync(final E... entities) {
-        return saveAsync(Arrays.asList(entities));
-    }
-
+public interface AsyncDeleteRepository<E, I extends Serializable> extends ObjectifyAware, Repository<E, I> {
     /**
      * Delete the given entity asynchronously.
      *

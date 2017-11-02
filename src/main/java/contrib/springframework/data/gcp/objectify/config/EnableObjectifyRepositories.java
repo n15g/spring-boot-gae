@@ -1,18 +1,13 @@
 package contrib.springframework.data.gcp.objectify.config;
 
-import contrib.springframework.data.gcp.objectify.support.BaseObjectifyRepository;
+import contrib.springframework.data.gcp.objectify.support.AbstractObjectifyRepository;
 import contrib.springframework.data.gcp.objectify.support.ObjectifyRepositoryFactoryBean;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.data.repository.query.QueryLookupStrategy.Key;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Annotation to enable JPA repositories. Will scan the package of the annotated configuration class for Spring Data
@@ -84,5 +79,5 @@ public @interface EnableObjectifyRepositories {
     /**
      * @return The repository base class to be used to create repository proxies for this particular configuration.
      */
-    Class<?> repositoryBaseClass() default BaseObjectifyRepository.class;
+    Class<?> repositoryBaseClass() default AbstractObjectifyRepository.class;
 }

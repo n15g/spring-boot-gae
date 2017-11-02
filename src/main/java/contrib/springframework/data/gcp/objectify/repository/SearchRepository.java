@@ -10,24 +10,19 @@ import org.springframework.data.repository.NoRepositoryBean;
 
 import javax.annotation.Nonnull;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
  * A searchable repository.
- * Extends the functionality of {@link Repository} and {@link AsyncRepository}, indexing the managed entity
+ * Extends the functionality of {@link SaveRepository} and {@link AsyncSaveRepository}, indexing the managed entity
  * and providing a mechanism to search on {@link SearchIndex} annotated fields.
  *
  * @param <E> Entity type.
  * @param <I> Entity Id Type.
  */
 @NoRepositoryBean
-public interface SearchRepository<E, I extends Serializable> extends Repository<E, I> {
+public interface SearchRepository<E, I extends Serializable> extends LoadRepository<E, I>, SaveRepository<E, I>, DeleteRepository<E, I> {
 
     /**
      * @return Search service.
@@ -159,14 +154,14 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
         unindexByKey(Arrays.asList(keys));
     }
 
-    /*--------- AsyncRepository ---------*/
+    /*--------- AsyncSaveRepository ---------*/
 
     @Nonnull
     @Override
     default Supplier<E> saveAsync(final E entity) {
         boolean needsId = hasNoId(entity);
 
-        final Supplier<E> saveOperation = Repository.super.saveAsync(entity);
+        final Supplier<E> saveOperation = SaveRepository.super.saveAsync(entity);
 
         // if the entity has no id we need the save to complete so we can index by the generated id.
         if (needsId) {
@@ -188,7 +183,7 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
     default Supplier<List<E>> saveAsync(final Collection<E> entities) {
         final List<I> ids = getId(entities);
 
-        final Supplier<List<E>> saveOperation = Repository.super.saveAsync(entities);
+        final Supplier<List<E>> saveOperation = SaveRepository.super.saveAsync(entities);
 
         // if any entity has no id we need the save to complete so we can index by the generated id.
         if (ids.contains(null)) {
@@ -212,18 +207,20 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
         return saveAsync(Arrays.asList(entities));
     }
 
+    /*--------- AsyncDeleteRepository ---------*/
+
     @Nonnull
     @Override
     default Runnable deleteAsync(E entity) {
         unIndex(entity);
-        return Repository.super.deleteAsync(entity);
+        return DeleteRepository.super.deleteAsync(entity);
     }
 
     @Nonnull
     @Override
     default Runnable deleteAsync(Collection<E> entities) {
         unindex(entities);
-        return Repository.super.deleteAsync(entities);
+        return DeleteRepository.super.deleteAsync(entities);
     }
 
     @Nonnull
@@ -237,14 +234,14 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
     @Override
     default Runnable deleteByKeyAsync(Key<E> key) {
         unindexByKey(key);
-        return Repository.super.deleteByKeyAsync(key);
+        return DeleteRepository.super.deleteByKeyAsync(key);
     }
 
     @Nonnull
     @Override
     default Runnable deleteByKeyAsync(Collection<Key<E>> keys) {
         unindexByKey(keys);
-        return Repository.super.deleteByKeyAsync(keys);
+        return DeleteRepository.super.deleteByKeyAsync(keys);
     }
 
     @Nonnull
@@ -254,7 +251,7 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
         return deleteByKeyAsync(Arrays.asList(keys));
     }
 
-    /*--------- Repository ---------*/
+    /*--------- SaveRepository ---------*/
 
     @Nonnull
     @Override
@@ -274,6 +271,9 @@ public interface SearchRepository<E, I extends Serializable> extends Repository<
     default List<E> save(E... entities) {
         return saveAsync(entities).get();
     }
+
+    /*--------- DeleteRepository ---------*/
+
 
     @Override
     default void delete(E entity) {

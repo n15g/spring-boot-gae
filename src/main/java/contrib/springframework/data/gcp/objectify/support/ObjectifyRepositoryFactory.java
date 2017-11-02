@@ -34,12 +34,12 @@ public class ObjectifyRepositoryFactory extends RepositoryFactorySupport {
     @Override
     @SuppressWarnings("unchecked")
     protected Object getTargetRepository(RepositoryInformation information) {
-        return new BaseObjectifyRepository(objectify, searchService, information.getDomainType(), information.getIdType());
+        return new AbstractObjectifyRepository(objectify, searchService, information.getDomainType(), information.getIdType());
     }
 
     @Override
     protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
-        return BaseObjectifyRepository.class;
+        return AbstractObjectifyRepository.class;
     }
 
     @Override

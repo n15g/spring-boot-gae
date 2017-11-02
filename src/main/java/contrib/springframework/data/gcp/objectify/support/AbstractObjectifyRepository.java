@@ -2,7 +2,7 @@ package contrib.springframework.data.gcp.objectify.support;
 
 import com.googlecode.objectify.Objectify;
 import contrib.springframework.data.gcp.objectify.ObjectifyProxy;
-import contrib.springframework.data.gcp.objectify.repository.SearchRepository;
+import contrib.springframework.data.gcp.objectify.repository.ObjectifyRepository;
 import contrib.springframework.data.gcp.search.NoOpSearchService;
 import contrib.springframework.data.gcp.search.SearchService;
 
@@ -13,7 +13,7 @@ import java.io.Serializable;
 /**
  * Basic Objectify repository implementation used to scaffold {@link org.springframework.stereotype.Repository} annotated beans.
  */
-public class BaseObjectifyRepository<E, I extends Serializable> implements SearchRepository<E, I> {
+public class AbstractObjectifyRepository<E, I extends Serializable> implements ObjectifyRepository<E, I> {
 
     private ObjectifyProxy objectify;
     private SearchService searchService;
@@ -28,7 +28,7 @@ public class BaseObjectifyRepository<E, I extends Serializable> implements Searc
      * @param entityType    The type of entity this repository manages.
      * @param idType        The id type of the entity this repository manages.
      */
-    public BaseObjectifyRepository(ObjectifyProxy objectify, @Nullable SearchService searchService, Class<E> entityType, Class<I> idType) {
+    public AbstractObjectifyRepository(ObjectifyProxy objectify, @Nullable SearchService searchService, Class<E> entityType, Class<I> idType) {
         this.objectify = objectify;
         this.searchService = searchService != null ? searchService : new NoOpSearchService();
         this.entityType = entityType;

@@ -11,8 +11,9 @@
     <logger name="contrib.springframework.data.gcp" level="TRACE"/>
 
     <logger name="org.springframework" level="ERROR"/>
+    <logger name="org.springframework.context.annotation" level="TRACE"/>
 
-    <root level="ERROR">
+    <root level="TRACE">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

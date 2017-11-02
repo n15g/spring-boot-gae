@@ -15,8 +15,6 @@ import java.io.Serializable;
  * {@link org.springframework.beans.factory.FactoryBean} adapter for factories that produce Objectify repositories.
  *
  * @param <T> Base repository type.
- * @author Oliver Gierke
- * @author Eberhard Wolff
  */
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 public class ObjectifyRepositoryFactoryBean<T extends Repository<E, I>, E, I extends Serializable>
