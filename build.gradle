@@ -1,7 +1,7 @@
 group 'contrib.springframework'
 
 apply plugin: 'java'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'wrapper'
 
 sourceCompatibility = 1.8
@@ -29,4 +29,28 @@ dependencies {
     testCompile "com.google.appengine:appengine-testing:${appengineVersion}"
     testCompile "com.google.appengine:appengine-api-stubs:${appengineVersion}"
     testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+
+task packageJavadoc(type: Jar, dependsOn: 'javadoc') {
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourceJar
+            artifact packageJavadoc
+            pom.withXml {
+                asNode().appendNode('description', 'Spring Boot Google App Engine Plugin')
+                asNode().appendNode('url', 'https://github.com/nicholas-armstrong/spring-boot-gae')
+            }
+        }
+    }
 }
