@@ -49,7 +49,7 @@ publishing {
             artifact packageJavadoc
             pom.withXml {
                 asNode().appendNode('description', 'Spring Boot Google App Engine Plugin')
-                asNode().appendNode('url', 'https://github.com/nicholas-armstrong/spring-boot-gae')
+                asNode().appendNode('url', 'https://github.com/n15g/spring-boot-gae')
             }
         }
     }
