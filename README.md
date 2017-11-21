@@ -1,13 +1,12 @@
-# Spring Data GCP
+# Spring Boot Google App Engine
 
-Support for Google Cloud Platform's Datastore via Objectify and the full-text search service running in an
-AppEngine standard environment.
+Spring Boot support for Google App Engine Datastore via Objectify and the full-text search API.
 
 ## Requirements
 
 * Java 8+
-* Gradle 4+ (if you don't want to use the wrapper)
 * Appengine Standard Java 8+
+* Gradle 4+ (if you don't want to use the wrapper)
 
 This library has been designed to work with the new Java8 Appengine Standard Environment. It will not work
 when deployed to the Java 7 standard environment.
