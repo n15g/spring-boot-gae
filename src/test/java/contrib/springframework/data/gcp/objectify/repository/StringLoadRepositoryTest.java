@@ -53,7 +53,7 @@ public class StringLoadRepositoryTest extends AbstractStringRepositoryTest {
         TestStringEntity[] entities = fixture.get(3);
         ofy().save().entities(entities).now();
 
-        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = repository.findAll(
+        List<TestStringEntity> result = repository.findAll(
                 Arrays.asList(
                         Key.create(TestStringEntity.class, "id1"),
                         Key.create(TestStringEntity.class, "id2"),
@@ -64,14 +64,12 @@ public class StringLoadRepositoryTest extends AbstractStringRepositoryTest {
         assertThat(result)
                 .isNotNull()
                 .hasSize(3)
-                .containsEntry(Key.create(TestStringEntity.class, "id1"), Optional.of(entities[0]))
-                .containsEntry(Key.create(TestStringEntity.class, "id2"), Optional.of(entities[1]))
-                .containsEntry(Key.create(TestStringEntity.class, "id3"), Optional.of(entities[2]));
+                .containsExactly(entities);
     }
 
     @Test
     public void findAllCollection_willReturnEmpty_whenNoKeysArePassed() throws Exception {
-        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = repository.findAll(
+        List<TestStringEntity> result = repository.findAll(
                 Collections.emptyList()
         );
 
@@ -85,7 +83,7 @@ public class StringLoadRepositoryTest extends AbstractStringRepositoryTest {
         TestStringEntity[] entities = fixture.get(2);
         ofy().save().entities(entities).now();
 
-        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = repository.findAll(
+        List<TestStringEntity> result = repository.findAll(
                 Arrays.asList(
                         Key.create(TestStringEntity.class, "id1"),
                         Key.create(TestStringEntity.class, "id2"),
@@ -96,9 +94,7 @@ public class StringLoadRepositoryTest extends AbstractStringRepositoryTest {
         assertThat(result)
                 .isNotNull()
                 .hasSize(2)
-                .containsEntry(Key.create(TestStringEntity.class, "id1"), Optional.of(entities[0]))
-                .containsEntry(Key.create(TestStringEntity.class, "id2"), Optional.of(entities[1]))
-                .doesNotContainKey(Key.create(TestStringEntity.class, "id100"));
+                .containsExactly(entities);
     }
 
     @Test
@@ -125,7 +121,7 @@ public class StringLoadRepositoryTest extends AbstractStringRepositoryTest {
         TestStringEntity[] entities = fixture.get(3);
         ofy().save().entities(entities).now();
 
-        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = repository.findAll(
+        List<TestStringEntity> result = repository.findAll(
                 Key.create(TestStringEntity.class, "id1"),
                 Key.create(TestStringEntity.class, "id2"),
                 Key.create(TestStringEntity.class, "id3")
@@ -134,15 +130,13 @@ public class StringLoadRepositoryTest extends AbstractStringRepositoryTest {
         assertThat(result)
                 .isNotNull()
                 .hasSize(3)
-                .containsEntry(Key.create(TestStringEntity.class, "id1"), Optional.of(entities[0]))
-                .containsEntry(Key.create(TestStringEntity.class, "id2"), Optional.of(entities[1]))
-                .containsEntry(Key.create(TestStringEntity.class, "id3"), Optional.of(entities[2]));
+                .containsExactly(entities);
     }
 
     @Test
     @SuppressWarnings("unchecked")
     public void findAllVarargs_willReturnEmpty_whenNoKeysArePassed() throws Exception {
-        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = repository.findAll((Key<TestStringEntity>[]) new Key[]{});
+        List<TestStringEntity> result = repository.findAll((Key<TestStringEntity>[]) new Key[]{});
 
         assertThat(result)
                 .isNotNull()
@@ -155,7 +149,7 @@ public class StringLoadRepositoryTest extends AbstractStringRepositoryTest {
         TestStringEntity[] entities = fixture.get(2);
         ofy().save().entities(entities).now();
 
-        Map<Key<TestStringEntity>, Optional<TestStringEntity>> result = repository.findAll(
+        List<TestStringEntity> result = repository.findAll(
                 Key.create(TestStringEntity.class, "id1"),
                 Key.create(TestStringEntity.class, "id2"),
                 Key.create(TestStringEntity.class, "id100")
@@ -164,9 +158,7 @@ public class StringLoadRepositoryTest extends AbstractStringRepositoryTest {
         assertThat(result)
                 .isNotNull()
                 .hasSize(2)
-                .containsEntry(Key.create(TestStringEntity.class, "id1"), Optional.of(entities[0]))
-                .containsEntry(Key.create(TestStringEntity.class, "id2"), Optional.of(entities[1]))
-                .doesNotContainKey(Key.create(TestStringEntity.class, "id100"));
+                .containsExactly(entities);
     }
 
     @Test
