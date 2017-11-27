@@ -8,11 +8,7 @@ import contrib.springframework.data.gcp.search.query.Result;
 import contrib.springframework.data.gcp.search.query.ResultImpl;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -216,6 +212,7 @@ public interface SearchService {
      *
      * @param entityClass Class of entity to unindex.
      * @param id          The entity id.
+     * @param <E>         Entity type.
      */
     <E> void unindex(Class<E> entityClass, String id);
 
@@ -254,6 +251,7 @@ public interface SearchService {
      * Clear a search index of all entries.
      *
      * @param entityClass Class of entity to clear index for.
+     * @param <E> Entity type.
      * @return Number of entries removed.
      */
     <E> int clear(Class<E> entityClass);

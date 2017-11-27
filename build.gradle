@@ -1,8 +1,16 @@
-group 'contrib.springframework'
+plugins {
+    id "io.codearte.nexus-staging" version "0.11.0"
+}
 
+apply plugin: 'io.codearte.nexus-staging'
 apply plugin: 'java'
-apply plugin: 'maven-publish'
 apply plugin: 'wrapper'
+apply plugin: 'signing'
+apply plugin: 'maven'
+
+
+description 'Spring Boot Google App Engine Plugin'
+group 'com.github.n15g'
 
 sourceCompatibility = 1.8
 
@@ -31,25 +39,60 @@ dependencies {
     testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-    classifier = 'sources'
+signing {
+    sign configurations.archives
 }
 
-task packageJavadoc(type: Jar, dependsOn: 'javadoc') {
-    from javadoc.destinationDir
+task javadocJar(type: Jar) {
     classifier = 'javadoc'
+    from javadoc
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            artifact sourceJar
-            artifact packageJavadoc
-            pom.withXml {
-                asNode().appendNode('description', 'Spring Boot Google App Engine Plugin')
-                asNode().appendNode('url', 'https://github.com/n15g/spring-boot-gae')
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUser, password: ossrhPassword)
+            }
+
+            pom.project {
+                name project.name
+                description project.description
+                packaging 'jar'
+                url 'https://github.com/n15g/spring-boot-gae'
+
+                scm {
+                    connection 'https://github.com/n15g/spring-boot-gae.git'
+                    developerConnection 'https://github.com/n15g/spring-boot-gae.git'
+                    url 'https://github.com/n15g/spring-boot-gae.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The MIT License (MIT)'
+                        url 'http://opensource.org/licenses/MIT'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'nicholas-armstrong'
+                        name = 'Nicholas Armstrong'
+                        email = 'nick@nicks-mail.com'
+                    }
+                }
             }
         }
     }

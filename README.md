@@ -2,6 +2,20 @@
 
 Spring Boot support for Google App Engine Datastore via Objectify and the full-text search API.
 
+Maven
+```
+<dependency>
+  <groupId>com.github.n15g</groupId>
+  <artifactId>spring-boot-gae</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+Gradle
+```
+compile 'com.github.n15g:spring-boot-gae:1.0.0'
+```
+
 ## Requirements
 
 * Java 8+
@@ -40,6 +54,8 @@ Not all of the limitations of the Search API are enforced by the framework, if i
 
 ## Misc
 
-### Updating the Library Version
+### Release to Central
 
-Update the `version` property in `gradle.properties`.
+```
+gradle uploadArchives closeAndReleaseRepository
+```
