@@ -53,30 +53,27 @@ public interface LoadRepository<E, I extends Serializable> extends ObjectifyAwar
      * Get the entities with the given keys, if they exist.
      *
      * @param keys List of keys to load.
-     * @return A map of loaded entities keyed by the entity key.
+     * @return A list of loaded entities keyed by the entity key.
      */
     @Nonnull
-    default Map<Key<E>, Optional<E>> findAll(Collection<Key<E>> keys) {
-        return ofy()
-                .load()
-                .keys(keys)
-                .entrySet()
-                .parallelStream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> Optional.ofNullable(entry.getValue())
-                ));
+    default List<E> findAll(Collection<Key<E>> keys) {
+        return new ArrayList<>(
+                ofy()
+                    .load()
+                    .keys(keys)
+                    .values()
+        );
     }
 
     /**
      * Get the entities with the given keys, if they exist.
      *
      * @param keys List of keys to load.
-     * @return A map of loaded entities keyed by the entity key.
+     * @return A list of loaded entities keyed by the entity key.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
-    default Map<Key<E>, Optional<E>> findAll(Key<E>... keys) {
+    default List<E> findAll(Key<E>... keys) {
         return findAll(Arrays.asList(keys));
     }
 
@@ -84,35 +81,32 @@ public interface LoadRepository<E, I extends Serializable> extends ObjectifyAwar
      * Get the entities with the given web-safe key strings, if they exist.
      *
      * @param webSafeStrings List of keys to load.
-     * @return A map of loaded entities keyed by the web-safe key string.
+     * @return A list of loaded entities keyed by the web-safe key string.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
-    default Map<String, Optional<E>> findAllByWebSafeKey(Collection<String> webSafeStrings) {
+    default List<E> findAllByWebSafeKey(Collection<String> webSafeStrings) {
         List<Key<E>> keys = webSafeStrings.stream()
                 .map(string -> (Key<E>) Key.create(string))
                 .collect(Collectors.toList());
 
-        return ofy()
-                .load()
-                .keys(keys)
-                .entrySet()
-                .parallelStream()
-                .collect(Collectors.toMap(
-                        entry -> entry.getKey().toWebSafeString(),
-                        entry -> Optional.ofNullable(entry.getValue())
-                ));
+        return new ArrayList<>(
+                ofy()
+                    .load()
+                    .keys(keys)
+                    .values()
+        );
     }
 
     /**
      * Get the entities with the given web-safe key strings, if they exist.
      *
      * @param webSafeStrings List of keys to load.
-     * @return A map of loaded entities keyed by the web-safe key string.
+     * @return A list of loaded entities keyed by the web-safe key string.
      */
     @Nonnull
     @SuppressWarnings("unchecked")
-    default Map<String, Optional<E>> findAllByWebSafeKey(String... webSafeStrings) {
+    default List<E> findAllByWebSafeKey(String... webSafeStrings) {
         return findAllByWebSafeKey(Arrays.asList(webSafeStrings));
     }
 

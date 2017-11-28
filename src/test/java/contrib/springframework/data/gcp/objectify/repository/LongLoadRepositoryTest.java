@@ -53,7 +53,7 @@ public class LongLoadRepositoryTest extends AbstractLongRepositoryTest {
         TestLongEntity[] entities = fixture.get(3);
         ofy().save().entities(entities).now();
 
-        Map<Key<TestLongEntity>, Optional<TestLongEntity>> result = repository.findAll(
+        List<TestLongEntity> result = repository.findAll(
                 Arrays.asList(
                         Key.create(TestLongEntity.class, 1L),
                         Key.create(TestLongEntity.class, 2L),
@@ -64,14 +64,12 @@ public class LongLoadRepositoryTest extends AbstractLongRepositoryTest {
         assertThat(result)
                 .isNotNull()
                 .hasSize(3)
-                .containsEntry(Key.create(TestLongEntity.class, 1L), Optional.of(entities[0]))
-                .containsEntry(Key.create(TestLongEntity.class, 2L), Optional.of(entities[1]))
-                .containsEntry(Key.create(TestLongEntity.class, 3L), Optional.of(entities[2]));
+                .containsExactly(entities);
     }
 
     @Test
     public void findAllCollection_willReturnEmpty_whenNoKeysArePassed() throws Exception {
-        Map<Key<TestLongEntity>, Optional<TestLongEntity>> result = repository.findAll(
+        List<TestLongEntity> result = repository.findAll(
                 Collections.emptyList()
         );
 
@@ -85,7 +83,7 @@ public class LongLoadRepositoryTest extends AbstractLongRepositoryTest {
         TestLongEntity[] entities = fixture.get(2);
         ofy().save().entities(entities).now();
 
-        Map<Key<TestLongEntity>, Optional<TestLongEntity>> result = repository.findAll(
+       List<TestLongEntity> result = repository.findAll(
                 Arrays.asList(
                         Key.create(TestLongEntity.class, 1L),
                         Key.create(TestLongEntity.class, 2L),
@@ -96,9 +94,7 @@ public class LongLoadRepositoryTest extends AbstractLongRepositoryTest {
         assertThat(result)
                 .isNotNull()
                 .hasSize(2)
-                .containsEntry(Key.create(TestLongEntity.class, 1L), Optional.of(entities[0]))
-                .containsEntry(Key.create(TestLongEntity.class, 2L), Optional.of(entities[1]))
-                .doesNotContainKey(Key.create(TestLongEntity.class, 999L));
+                .containsExactly(entities);
     }
 
     @Test
@@ -125,7 +121,7 @@ public class LongLoadRepositoryTest extends AbstractLongRepositoryTest {
         TestLongEntity[] entities = fixture.get(3);
         ofy().save().entities(entities).now();
 
-        Map<Key<TestLongEntity>, Optional<TestLongEntity>> result = repository.findAll(
+        List<TestLongEntity> result = repository.findAll(
                 Key.create(TestLongEntity.class, 1L),
                 Key.create(TestLongEntity.class, 2L),
                 Key.create(TestLongEntity.class, 3L)
@@ -134,15 +130,13 @@ public class LongLoadRepositoryTest extends AbstractLongRepositoryTest {
         assertThat(result)
                 .isNotNull()
                 .hasSize(3)
-                .containsEntry(Key.create(TestLongEntity.class, 1L), Optional.of(entities[0]))
-                .containsEntry(Key.create(TestLongEntity.class, 2L), Optional.of(entities[1]))
-                .containsEntry(Key.create(TestLongEntity.class, 3L), Optional.of(entities[2]));
+                .containsExactly(entities);
     }
 
     @Test
     @SuppressWarnings("unchecked")
     public void findAllVarargs_willReturnEmpty_whenNoKeysArePassed() throws Exception {
-        Map<Key<TestLongEntity>, Optional<TestLongEntity>> result = repository.findAll((Key<TestLongEntity>[]) new Key[]{});
+        List<TestLongEntity> result = repository.findAll((Key<TestLongEntity>[]) new Key[]{});
 
         assertThat(result)
                 .isNotNull()
@@ -155,7 +149,7 @@ public class LongLoadRepositoryTest extends AbstractLongRepositoryTest {
         TestLongEntity[] entities = fixture.get(2);
         ofy().save().entities(entities).now();
 
-        Map<Key<TestLongEntity>, Optional<TestLongEntity>> result = repository.findAll(
+        List<TestLongEntity> result = repository.findAll(
                 Key.create(TestLongEntity.class, 1L),
                 Key.create(TestLongEntity.class, 2L),
                 Key.create(TestLongEntity.class, 999L)
@@ -164,9 +158,7 @@ public class LongLoadRepositoryTest extends AbstractLongRepositoryTest {
         assertThat(result)
                 .isNotNull()
                 .hasSize(2)
-                .containsEntry(Key.create(TestLongEntity.class, 1L), Optional.of(entities[0]))
-                .containsEntry(Key.create(TestLongEntity.class, 2L), Optional.of(entities[1]))
-                .doesNotContainKey(Key.create(TestLongEntity.class, 999L));
+                .containsExactly(entities);
     }
 
     @Test
