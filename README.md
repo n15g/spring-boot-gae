@@ -19,6 +19,9 @@ Gradle
 compile 'com.github.n15g:spring-boot-gae:1.0.0'
 ```
 
+## Trello
+https://trello.com/b/lgwbSi6o/spring-boot-gae
+
 ## Requirements
 
 * Java 8+
@@ -29,13 +32,6 @@ This library has been designed to work with the new Java8 Appengine Standard Env
 when deployed to the Java 7 standard environment.
 
 ## Getting Started
-
-### Installing the Library
-To install the library to your local maven repository (to use it in other projects), run the following:
-
-```
-./gradlew install
-```
 
 ### SearchRepository
 Repositories extending`SearchRepository` will automatically index saved entities in the `SearchService` using
@@ -61,4 +57,11 @@ Not all of the limitations of the Search API are enforced by the framework, if i
 
 ```
 gradle -Prelease uploadArchives closeAndReleaseRepository
+```
+
+### Installing the Library
+To install the library to your local maven repository, run the following:
+
+```
+./gradlew install
 ```
