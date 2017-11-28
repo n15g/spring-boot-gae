@@ -34,7 +34,7 @@ when deployed to the Java 7 standard environment.
 To install the library to your local maven repository (to use it in other projects), run the following:
 
 ```
-./gradlew publishToMavenLocal
+./gradlew install
 ```
 
 ### SearchRepository
