@@ -39,58 +39,60 @@ dependencies {
     testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
 }
 
-signing {
-    sign configurations.archives
-}
+if (project.hasProperty('release')) {
+    signing {
+        sign configurations.archives
+    }
 
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
 
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
 
-artifacts {
-    archives javadocJar, sourcesJar
-}
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUser, password: ossrhPassword)
-            }
-
-            pom.project {
-                name project.name
-                description project.description
-                packaging 'jar'
-                url 'https://github.com/n15g/spring-boot-gae'
-
-                scm {
-                    connection 'https://github.com/n15g/spring-boot-gae.git'
-                    developerConnection 'https://github.com/n15g/spring-boot-gae.git'
-                    url 'https://github.com/n15g/spring-boot-gae.git'
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: ossrhUser, password: ossrhPassword)
                 }
 
-                licenses {
-                    license {
-                        name 'The MIT License (MIT)'
-                        url 'http://opensource.org/licenses/MIT'
-                        distribution 'repo'
+                pom.project {
+                    name project.name
+                    description project.description
+                    packaging 'jar'
+                    url 'https://github.com/n15g/spring-boot-gae'
+
+                    scm {
+                        connection 'https://github.com/n15g/spring-boot-gae.git'
+                        developerConnection 'https://github.com/n15g/spring-boot-gae.git'
+                        url 'https://github.com/n15g/spring-boot-gae.git'
                     }
-                }
 
-                developers {
-                    developer {
-                        id = 'nicholas-armstrong'
-                        name = 'Nicholas Armstrong'
-                        email = 'nick@nicks-mail.com'
+                    licenses {
+                        license {
+                            name 'The MIT License (MIT)'
+                            url 'http://opensource.org/licenses/MIT'
+                            distribution 'repo'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = 'nicholas-armstrong'
+                            name = 'Nicholas Armstrong'
+                            email = 'nick@nicks-mail.com'
+                        }
                     }
                 }
             }
