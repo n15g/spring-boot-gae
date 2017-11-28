@@ -5,6 +5,8 @@ Spring Boot support for Google App Engine Datastore via Objectify and the full-t
 #### Note: There are some minor breaking API changes coming in `1.1`
 * `LoadRepository.findAll()` will now return a `List<E>` instead of a `Map<Key<E>, Optional<E>>`. 
 
+### Latest Stable
+
 Maven
 ```
 <dependency>
@@ -17,6 +19,22 @@ Maven
 Gradle
 ```
 compile 'com.github.n15g:spring-boot-gae:1.0.0'
+```
+
+### Latest Unstable
+
+Maven
+```
+<dependency>
+  <groupId>com.github.n15g</groupId>
+  <artifactId>spring-boot-gae</artifactId>
+  <version>1.1.0-beta-1</version>
+</dependency>
+```
+
+Gradle
+```
+compile 'com.github.n15g:spring-boot-gae:1.1.0-beta-1'
 ```
 
 ## Trello
