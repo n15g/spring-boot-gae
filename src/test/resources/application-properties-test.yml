@@ -1,5 +1,0 @@
-spring:
-  data:
-    gcp:
-      search:
-        index-naming-strategy: contrib.springframework.data.gcp.search.metadata.impl.FQIndexNamingStrategy

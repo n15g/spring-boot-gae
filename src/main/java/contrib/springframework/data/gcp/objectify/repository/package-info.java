@@ -1,4 +1,0 @@
-@ParametersAreNonnullByDefault
-package contrib.springframework.data.gcp.objectify.repository;
-
-import javax.annotation.ParametersAreNonnullByDefault;
