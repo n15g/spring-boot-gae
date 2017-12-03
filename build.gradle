@@ -54,13 +54,18 @@ if (project.hasProperty('release')) {
         from sourceSets.main.allSource
     }
 
+    task testJar(type: Jar) {
+        classifier = 'tests'
+        from sourceSets.test.output
+    }
+
     task testSourcesJar(type: Jar) {
         classifier = 'testSources'
         from sourceSets.test.allSource
     }
 
     artifacts {
-        archives javadocJar, sourcesJar, testSourcesJar
+        archives javadocJar, sourcesJar, testJar, testSourcesJar
     }
 
     uploadArchives {

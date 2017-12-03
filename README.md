@@ -2,8 +2,8 @@
 
 Spring Boot support for Google App Engine Datastore via Objectify and the full-text search API.
 
-#### Note: There are some minor breaking API changes coming in `1.1`
-* `LoadRepository.findAll()` will now return a `List<E>` instead of a `Map<Key<E>, Optional<E>>`. 
+#### Note: This project has Moooooooo🐄ved to https://github.com/3wks/spring-boot-gae
+
 
 ### Latest Stable
 
