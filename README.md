@@ -2,7 +2,11 @@
 
 Spring Boot support for Google App Engine Datastore via Objectify and the full-text search API.
 
-#### Note: This project has Moooooooo🐄ved to https://github.com/3wks/spring-boot-gae
+ Note: This project was Moooooooo🐄ved to https://github.com/3wks/spring-boot-gae, but they since shut down and
+the repo was removed. That being said, there's not really any reason to use this project any more, there are
+better alternatives, and this would only work on the legacy Java8 version of AppEngine. 
+
+I'm just keeping it around 'cause it was fun to build and might be a good reference in the future.
 
 
 ### Latest Stable
